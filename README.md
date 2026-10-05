@@ -4,7 +4,7 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 3 adds Job Seeker and company profiles, normalized skills, recruiter-owned job postings, controlled publishing and closing, and a public searchable job catalog. React, Flutter, CV processing, job ranking, applications, and Agentic AI behavior remain intentionally deferred.
+Part 4 adds the responsive React web application: shared Job Seeker and Recruiter authentication, role-protected workspaces, public job discovery, Job Seeker profiles, company profiles, and recruiter job management. Flutter, CV processing, job ranking, applications, and Agentic AI behavior remain intentionally deferred.
 
 ## Planned architecture
 
@@ -31,6 +31,7 @@ React and Flutter will use the same API, identity, roles, permissions, and busin
 ## Prerequisites
 
 - .NET 10 SDK
+- Node.js 24 and npm
 - PostgreSQL 17 or Docker Desktop
 - Flutter will be required in a later increment
 
@@ -93,10 +94,26 @@ The API exposes:
 
 See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for request shapes, filters, and status rules.
 
+## Run the React web app
+
+```powershell
+cd web
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. The development API allows this origin by default. Set `VITE_API_BASE_URL` in `web/.env.local` if the API uses another address.
+
+The web client supports both roles. Application pages clearly remain reserved until the application, audit, and notification workflow is implemented in Part 8. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
+
 ## Run the tests
 
 ```powershell
 dotnet test NextRoleAI.sln
+cd web
+npm run lint
+npm test
+npm run build
 ```
 
 PostgreSQL integration tests run automatically in GitHub Actions. To run them locally, set `NEXTROLEAI_TEST_CONNECTION_STRING` to a disposable PostgreSQL database before running the test command.
