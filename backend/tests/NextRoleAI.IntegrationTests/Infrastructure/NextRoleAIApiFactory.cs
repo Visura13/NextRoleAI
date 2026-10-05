@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace NextRoleAI.IntegrationTests.Infrastructure;
 
@@ -8,10 +9,14 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
         var connectionString = Environment.GetEnvironmentVariable(
             "NEXTROLEAI_TEST_CONNECTION_STRING");
 
-        builder.UseEnvironment("Testing");
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
             configuration.AddInMemoryCollection(
@@ -27,5 +32,7 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
                     ["Jwt:RefreshTokenDays"] = "7"
                 });
         });
+
+        return base.CreateHost(builder);
     }
 }
