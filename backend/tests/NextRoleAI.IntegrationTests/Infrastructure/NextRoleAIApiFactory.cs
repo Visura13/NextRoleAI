@@ -1,38 +1,46 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 
 namespace NextRoleAI.IntegrationTests.Infrastructure;
 
 public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
 {
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        builder.UseEnvironment("Testing");
-    }
+    private readonly Dictionary<string, string?> originalEnvironment = [];
 
-    protected override IHost CreateHost(IHostBuilder builder)
+    public NextRoleAIApiFactory()
     {
         var connectionString = Environment.GetEnvironmentVariable(
             "NEXTROLEAI_TEST_CONNECTION_STRING");
 
-        builder.ConfigureAppConfiguration((_, configuration) =>
-        {
-            configuration.AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    ["ConnectionStrings:DefaultConnection"] = connectionString,
-                    ["Database:ApplyMigrationsOnStartup"] = "true",
-                    ["Jwt:Issuer"] = "NextRoleAI.IntegrationTests",
-                    ["Jwt:Audience"] = "NextRoleAI.TestClients",
-                    ["Jwt:SigningKey"] =
-                        "integration-tests-only-signing-key-with-more-than-32-characters",
-                    ["Jwt:AccessTokenMinutes"] = "15",
-                    ["Jwt:RefreshTokenDays"] = "7"
-                });
-        });
+        SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
+        SetEnvironmentVariable("ConnectionStrings__DefaultConnection", connectionString);
+        SetEnvironmentVariable("Database__ApplyMigrationsOnStartup", "true");
+        SetEnvironmentVariable("Jwt__Issuer", "NextRoleAI.IntegrationTests");
+        SetEnvironmentVariable("Jwt__Audience", "NextRoleAI.TestClients");
+        SetEnvironmentVariable(
+            "Jwt__SigningKey",
+            "integration-tests-only-signing-key-with-more-than-32-characters");
+        SetEnvironmentVariable("Jwt__AccessTokenMinutes", "15");
+        SetEnvironmentVariable("Jwt__RefreshTokenDays", "7");
+    }
 
-        return base.CreateHost(builder);
+    protected override void Dispose(bool disposing)
+    {
+        try
+        {
+            base.Dispose(disposing);
+        }
+        finally
+        {
+            foreach (var (name, value) in originalEnvironment)
+            {
+                Environment.SetEnvironmentVariable(name, value);
+            }
+        }
+    }
+
+    private void SetEnvironmentVariable(string name, string? value)
+    {
+        originalEnvironment[name] = Environment.GetEnvironmentVariable(name);
+        Environment.SetEnvironmentVariable(name, value);
     }
 }
