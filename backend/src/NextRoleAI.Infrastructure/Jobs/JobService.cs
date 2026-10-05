@@ -95,7 +95,6 @@ internal sealed class JobService(
                 "Closed job postings cannot be edited.");
         }
 
-        dbContext.JobSkills.RemoveRange(job.Skills);
         job.Skills.Clear();
         Apply(job, input);
         job.UpdatedAtUtc = timeProvider.GetUtcNow();

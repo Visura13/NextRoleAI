@@ -43,7 +43,6 @@ internal sealed class ProfileService(
         }
         else
         {
-            dbContext.JobSeekerSkills.RemoveRange(profile.Skills);
             profile.Skills.Clear();
         }
 
