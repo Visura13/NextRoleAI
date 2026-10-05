@@ -4,12 +4,14 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 1 - Repository and API foundation
 
+- Status: complete
 - ASP.NET Core solution and layered project boundaries
 - Health endpoints and first API test
 - Repository conventions and backend CI
 
 ## Part 2 - PostgreSQL and authentication
 
+- Status: complete on `feature/part-2-authentication`
 - PostgreSQL and Entity Framework Core
 - ASP.NET Core Identity with JobSeeker and Recruiter roles
 - JWT access tokens and refresh-token rotation
@@ -18,6 +20,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 3 - Profiles and recruiter job management
 
+- Status: not started
 - Job-seeker and recruiter/company profiles
 - Job-posting entities, skills, validation, ownership, and status
 - CRUD, search, filtering, sorting, and pagination
@@ -25,6 +28,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 4 - React web application
 
+- Status: not started
 - Shared authentication and protected routes
 - Job-seeker profile, jobs, and application screens
 - Recruiter company, job-management, and application-review screens
@@ -32,6 +36,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 5 - Flutter job-seeker application
 
+- Status: not started
 - Shared authentication with secure token storage
 - CV file picker or camera capture
 - Job browsing, recommendations, applications, and status tracking
@@ -39,6 +44,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 6 - CV processing and deterministic ranking
 
+- Status: not started
 - Secure CV upload and storage abstraction
 - Structured CV profile and user correction flow
 - Testable weighted job-matching engine
@@ -46,6 +52,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 7 - Controlled Agentic AI workflow
 
+- Status: not started
 - Planning, CV Profile, Job Discovery, and Validation agents
 - Allow-listed tools and structured input/output contracts
 - Durable workflow state, retries, timeouts, logs, and safe failures
@@ -53,6 +60,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 8 - Cross-platform approval and notifications
 
+- Status: not started
 - Application workflow from Flutter or React
 - Recruiter decision through React
 - Updated Job Seeker status in both clients
@@ -60,6 +68,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 9 - Quality, deployment, and assessment evidence
 
+- Status: not started
 - End-to-end, performance, security, and agent-evaluation tests
 - Deployment and APK generation
 - Architecture diagrams, ER diagram, ADRs, reports, and README completion
