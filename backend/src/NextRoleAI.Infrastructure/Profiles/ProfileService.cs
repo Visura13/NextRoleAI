@@ -30,7 +30,6 @@ internal sealed class ProfileService(
             cancellationToken);
         var now = timeProvider.GetUtcNow();
         var profile = await dbContext.JobSeekerProfiles
-            .Include(candidate => candidate.Skills)
             .SingleOrDefaultAsync(candidate => candidate.UserId == userId, cancellationToken);
 
         if (profile is null)
@@ -48,12 +47,6 @@ internal sealed class ProfileService(
             await dbContext.JobSeekerSkills
                 .Where(skill => skill.JobSeekerProfileId == profile.Id)
                 .ExecuteDeleteAsync(cancellationToken);
-            foreach (var skill in profile.Skills)
-            {
-                dbContext.Entry(skill).State = EntityState.Detached;
-            }
-
-            profile.Skills.Clear();
         }
 
         profile.Headline = update.Headline.Trim();

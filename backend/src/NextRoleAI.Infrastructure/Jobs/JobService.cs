@@ -84,7 +84,12 @@ internal sealed class JobService(
     {
         await using var transaction = await dbContext.Database.BeginTransactionAsync(
             cancellationToken);
-        var job = await FindOwnedAsync(recruiterUserId, jobId, cancellationToken);
+        var job = await dbContext.JobPostings
+            .Include(candidate => candidate.CompanyProfile)
+            .SingleOrDefaultAsync(
+                candidate => candidate.Id == jobId &&
+                    candidate.CompanyProfile.RecruiterUserId == recruiterUserId,
+                cancellationToken);
         if (job is null)
         {
             return NotFound();
@@ -100,12 +105,6 @@ internal sealed class JobService(
         await dbContext.JobSkills
             .Where(skill => skill.JobPostingId == job.Id)
             .ExecuteDeleteAsync(cancellationToken);
-        foreach (var skill in job.Skills)
-        {
-            dbContext.Entry(skill).State = EntityState.Detached;
-        }
-
-        job.Skills.Clear();
         Apply(job, input);
         job.UpdatedAtUtc = timeProvider.GetUtcNow();
         await dbContext.SaveChangesAsync(cancellationToken);
