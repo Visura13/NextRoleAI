@@ -58,24 +58,18 @@ internal sealed class ProfileService(
 
         foreach (var skill in NormaliseSkills(update.Skills))
         {
-            profile.Skills.Add(new JobSeekerSkill
+            var profileSkill = new JobSeekerSkill
             {
                 Id = Guid.NewGuid(),
-                Name = skill
-            });
+                JobSeekerProfileId = profile.Id,
+                Name = skill,
+                JobSeekerProfile = profile
+            };
+            profile.Skills.Add(profileSkill);
+            dbContext.JobSeekerSkills.Add(profileSkill);
         }
 
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateConcurrencyException exception)
-        {
-            throw new InvalidOperationException(
-                $"Profile save concurrency entries: {DescribeEntries(exception)}",
-                exception);
-        }
-
+        await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         return ToResult(profile);
     }
@@ -134,12 +128,6 @@ internal sealed class ProfileService(
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
-
-    private static string DescribeEntries(DbUpdateConcurrencyException exception) =>
-        string.Join(
-            ", ",
-            exception.Entries.Select(entry =>
-                $"{entry.Metadata.ClrType.Name}:{entry.State}"));
 
     private static JobSeekerProfileResult ToResult(JobSeekerProfile profile) =>
         new(

@@ -106,18 +106,9 @@ internal sealed class JobService(
             .Where(skill => skill.JobPostingId == job.Id)
             .ExecuteDeleteAsync(cancellationToken);
         Apply(job, input);
+        dbContext.JobSkills.AddRange(job.Skills);
         job.UpdatedAtUtc = timeProvider.GetUtcNow();
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateConcurrencyException exception)
-        {
-            throw new InvalidOperationException(
-                $"Job save concurrency entries: {DescribeEntries(exception)}",
-                exception);
-        }
-
+        await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
         return JobCommandResult.Success(ToResult(job));
@@ -296,8 +287,10 @@ internal sealed class JobService(
             job.Skills.Add(new JobSkill
             {
                 Id = Guid.NewGuid(),
+                JobPostingId = job.Id,
                 Name = skill.Name,
-                IsRequired = skill.IsRequired
+                IsRequired = skill.IsRequired,
+                JobPosting = job
             });
         }
     }
@@ -312,12 +305,6 @@ internal sealed class JobService(
                 group.Any(skill => skill.IsRequired)))
             .OrderBy(skill => skill.Name, StringComparer.OrdinalIgnoreCase)
             .ToArray();
-
-    private static string DescribeEntries(DbUpdateConcurrencyException exception) =>
-        string.Join(
-            ", ",
-            exception.Entries.Select(entry =>
-                $"{entry.Metadata.ClrType.Name}:{entry.State}"));
 
     private static async Task<PagedResult<JobResult>> ToPageAsync(
         IOrderedQueryable<JobPosting> query,
