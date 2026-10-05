@@ -12,6 +12,23 @@ permissions:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      NEXTROLEAI_TEST_CONNECTION_STRING: Host=localhost;Port=5432;Database=nextroleai_test;Username=nextroleai;Password=nextroleai_ci
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: nextroleai_test
+          POSTGRES_USER: nextroleai
+          POSTGRES_PASSWORD: nextroleai_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nextroleai -d nextroleai_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Check out repository
@@ -25,7 +42,7 @@ jobs:
           cache-dependency-path: backend/**/packages.lock.json
 
       - name: Restore dependencies
-        run: dotnet restore NextRoleAI.sln
+        run: dotnet restore NextRoleAI.sln --locked-mode
 
       - name: Build
         run: dotnet build NextRoleAI.sln --configuration Release --no-restore

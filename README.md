@@ -4,7 +4,7 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 1 establishes the backend solution boundaries, a runnable ASP.NET Core API, health endpoints, test infrastructure, and the first GitHub Actions workflow. Database access, authentication, frontend clients, and Agentic AI behavior are intentionally deferred to later increments.
+Part 2 adds PostgreSQL persistence, Entity Framework Core migrations, ASP.NET Core Identity, JWT access tokens, rotating refresh tokens, Job Seeker and Recruiter registration, login, logout, current-user lookup, role policies, and PostgreSQL integration tests. Profiles, job postings, frontend clients, and Agentic AI behavior remain intentionally deferred.
 
 ## Planned architecture
 
@@ -30,7 +30,32 @@ React and Flutter will use the same API, identity, roles, permissions, and busin
 ## Prerequisites
 
 - .NET 10 SDK
-- PostgreSQL and Flutter will be required in later increments
+- PostgreSQL 17 or Docker Desktop
+- Flutter will be required in a later increment
+
+## Configure local development
+
+Copy `.env.example` to `.env`, choose a local PostgreSQL password, and generate a random JWT signing key with at least 32 characters. Never commit the completed `.env` file.
+
+Start PostgreSQL with Docker:
+
+```powershell
+docker compose up -d postgres
+```
+
+Configure the API process in the current PowerShell session:
+
+```powershell
+$env:ConnectionStrings__DefaultConnection = "Host=localhost;Port=5432;Database=nextroleai;Username=nextroleai;Password=YOUR_LOCAL_PASSWORD"
+$env:Jwt__SigningKey = "YOUR_RANDOM_SIGNING_KEY_WITH_AT_LEAST_32_CHARACTERS"
+```
+
+Restore local tools and apply migrations:
+
+```powershell
+dotnet tool restore
+dotnet ef database update --project backend/src/NextRoleAI.Infrastructure --startup-project backend/src/NextRoleAI.Api
+```
 
 ## Run the API
 
@@ -43,12 +68,28 @@ The API exposes:
 
 - `GET /health`: infrastructure-friendly health endpoint.
 - `GET /api/health`: JSON service health response.
+- `POST /api/auth/register/job-seeker`: create a Job Seeker account.
+- `POST /api/auth/register/recruiter`: create a Recruiter account.
+- `POST /api/auth/login`: authenticate an existing user.
+- `POST /api/auth/refresh`: rotate a refresh token and issue a new token pair.
+- `POST /api/auth/logout`: revoke a refresh token.
+- `GET /api/auth/me`: return the authenticated user's shared identity and role.
 
 ## Run the tests
 
 ```powershell
 dotnet test NextRoleAI.sln
 ```
+
+PostgreSQL integration tests run automatically in GitHub Actions. To run them locally, set `NEXTROLEAI_TEST_CONNECTION_STRING` to a disposable PostgreSQL database before running the test command.
+
+## Authentication security
+
+- Passwords are hashed and verified by ASP.NET Core Identity.
+- Access tokens are short-lived JWTs and contain the user's stable ID and role.
+- Refresh tokens are random, stored only as SHA-256 hashes, rotated on use, and revoked on logout.
+- Reuse of a rotated refresh token revokes the user's remaining active sessions.
+- JWT signing keys and database credentials are supplied through environment variables and are never committed.
 
 ## Roles in the current scope
 
