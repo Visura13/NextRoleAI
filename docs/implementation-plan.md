@@ -47,7 +47,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 6 - CV processing and deterministic ranking
 
-- Status: complete on `feature/part-6-cv-ranking`
+- Status: complete and merged
 - Secure CV upload and storage abstraction
 - Structured CV profile and user correction flow
 - Testable weighted job-matching engine
@@ -55,11 +55,12 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 7 - Controlled Agentic AI workflow
 
-- Status: not started
+- Status: complete on `feature/part-7-agentic-workflow`
 - Planning, CV Profile, Job Discovery, and Validation agents
 - Allow-listed tools and structured input/output contracts
 - Durable workflow state, retries, timeouts, logs, and safe failures
 - Prompt-injection defenses and deterministic validation
+- Human approval, rejection, and full revision cycles in React and Flutter
 
 ## Part 8 - Cross-platform approval and notifications
 

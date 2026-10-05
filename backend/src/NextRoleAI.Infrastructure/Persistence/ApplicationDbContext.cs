@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NextRoleAI.Domain.AgentWorkflows;
 using NextRoleAI.Domain.Cvs;
 using NextRoleAI.Domain.Jobs;
 using NextRoleAI.Domain.Profiles;
@@ -25,6 +26,18 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<CvDocument> CvDocuments => Set<CvDocument>();
 
     public DbSet<CvSkill> CvSkills => Set<CvSkill>();
+
+    public DbSet<AgentWorkflowRun> AgentWorkflowRuns => Set<AgentWorkflowRun>();
+
+    public DbSet<AgentWorkflowStep> AgentWorkflowSteps => Set<AgentWorkflowStep>();
+
+    public DbSet<AgentToolCall> AgentToolCalls => Set<AgentToolCall>();
+
+    public DbSet<AgentValidationResult> AgentValidationResults => Set<AgentValidationResult>();
+
+    public DbSet<AgentShortlistItem> AgentShortlistItems => Set<AgentShortlistItem>();
+
+    public DbSet<AgentApprovalDecision> AgentApprovalDecisions => Set<AgentApprovalDecision>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -168,6 +181,104 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.HasOne(skill => skill.CvDocument)
                 .WithMany(document => document.Skills)
                 .HasForeignKey(skill => skill.CvDocumentId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<AgentWorkflowRun>(entity =>
+        {
+            entity.ToTable("AgentWorkflowRuns");
+            entity.HasKey(workflow => workflow.Id);
+            entity.Property(workflow => workflow.UserId).IsRequired();
+            entity.Property(workflow => workflow.Objective).HasMaxLength(500).IsRequired();
+            entity.Property(workflow => workflow.Status).HasConversion<string>().HasMaxLength(30);
+            entity.Property(workflow => workflow.ApprovalStatus).HasConversion<string>().HasMaxLength(30);
+            entity.Property(workflow => workflow.CurrentAgent).HasMaxLength(100).IsRequired();
+            entity.Property(workflow => workflow.FailureCode).HasMaxLength(100);
+            entity.Property(workflow => workflow.FailureMessage).HasMaxLength(1000);
+            entity.Property(workflow => workflow.FinalSummary).HasMaxLength(2000);
+            entity.HasIndex(workflow => new { workflow.UserId, workflow.CreatedAtUtc });
+            entity.HasIndex(workflow => new { workflow.Status, workflow.UpdatedAtUtc });
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(workflow => workflow.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<AgentWorkflowStep>(entity =>
+        {
+            entity.ToTable("AgentWorkflowSteps");
+            entity.HasKey(step => step.Id);
+            entity.Property(step => step.AgentName).HasMaxLength(100).IsRequired();
+            entity.Property(step => step.Responsibility).HasMaxLength(500).IsRequired();
+            entity.Property(step => step.AllowedTools).HasMaxLength(500).IsRequired();
+            entity.Property(step => step.Status).HasConversion<string>().HasMaxLength(30);
+            entity.Property(step => step.InputJson).HasColumnType("jsonb").IsRequired();
+            entity.Property(step => step.OutputJson).HasColumnType("jsonb");
+            entity.Property(step => step.Error).HasMaxLength(1000);
+            entity.HasIndex(step => new { step.WorkflowRunId, step.Sequence }).IsUnique();
+            entity.HasOne(step => step.WorkflowRun)
+                .WithMany(workflow => workflow.Steps)
+                .HasForeignKey(step => step.WorkflowRunId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<AgentToolCall>(entity =>
+        {
+            entity.ToTable("AgentToolCalls");
+            entity.HasKey(call => call.Id);
+            entity.Property(call => call.ToolName).HasMaxLength(100).IsRequired();
+            entity.Property(call => call.InputJson).HasColumnType("jsonb").IsRequired();
+            entity.Property(call => call.OutputJson).HasColumnType("jsonb");
+            entity.Property(call => call.Error).HasMaxLength(1000);
+            entity.HasIndex(call => new { call.WorkflowStepId, call.StartedAtUtc });
+            entity.HasOne(call => call.WorkflowStep)
+                .WithMany(step => step.ToolCalls)
+                .HasForeignKey(call => call.WorkflowStepId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<AgentValidationResult>(entity =>
+        {
+            entity.ToTable("AgentValidationResults");
+            entity.HasKey(result => result.Id);
+            entity.Property(result => result.RuleName).HasMaxLength(150).IsRequired();
+            entity.Property(result => result.Message).HasMaxLength(1000).IsRequired();
+            entity.HasIndex(result => new { result.WorkflowRunId, result.CreatedAtUtc });
+            entity.HasOne(result => result.WorkflowRun)
+                .WithMany(workflow => workflow.ValidationResults)
+                .HasForeignKey(result => result.WorkflowRunId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<AgentShortlistItem>(entity =>
+        {
+            entity.ToTable("AgentShortlistItems");
+            entity.HasKey(item => item.Id);
+            entity.Property(item => item.Score).HasPrecision(5, 1);
+            entity.Property(item => item.ReasonSummary).HasMaxLength(1500).IsRequired();
+            entity.HasIndex(item => new { item.WorkflowRunId, item.Rank }).IsUnique();
+            entity.HasIndex(item => new { item.WorkflowRunId, item.JobPostingId }).IsUnique();
+            entity.HasOne(item => item.WorkflowRun)
+                .WithMany(workflow => workflow.ShortlistItems)
+                .HasForeignKey(item => item.WorkflowRunId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(item => item.JobPosting)
+                .WithMany()
+                .HasForeignKey(item => item.JobPostingId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<AgentApprovalDecision>(entity =>
+        {
+            entity.ToTable("AgentApprovalDecisions");
+            entity.HasKey(decision => decision.Id);
+            entity.Property(decision => decision.DecidedByUserId).IsRequired();
+            entity.Property(decision => decision.Decision).HasConversion<string>().HasMaxLength(30);
+            entity.Property(decision => decision.Feedback).HasMaxLength(1000).IsRequired();
+            entity.HasIndex(decision => new { decision.WorkflowRunId, decision.DecidedAtUtc });
+            entity.HasOne(decision => decision.WorkflowRun)
+                .WithMany(workflow => workflow.ApprovalDecisions)
+                .HasForeignKey(decision => decision.WorkflowRunId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

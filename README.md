@@ -4,7 +4,7 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 6 adds secure PDF/DOCX upload, local private file storage, reviewable CV extraction, and deterministic explainable job ranking across the React and Flutter Job Seeker clients. Applications and controlled Agentic AI behavior remain intentionally deferred to their planned increments.
+Part 7 adds a controlled four-agent job-shortlisting workflow across the React and Flutter Job Seeker clients. It uses allow-listed tools, structured state, deterministic validation, prompt-injection defenses, retries, timeouts, a durable audit trail, and an explicit human approval gate. Application submission and recruiter decisions remain deferred to Part 8.
 
 ## Planned architecture
 
@@ -96,8 +96,12 @@ The API exposes:
 - `GET|POST|DELETE /api/cv`: read, upload/replace, or delete the Job Seeker's private CV.
 - `PUT /api/cv/profile`: correct and confirm the extracted CV profile.
 - `GET /api/recommendations`: rank published jobs for a confirmed CV with evidence and a score breakdown.
+- `POST /api/agent-workflows`: start a controlled Job Seeker shortlist workflow.
+- `GET /api/agent-workflows`: list the current Job Seeker's durable workflow history.
+- `GET /api/agent-workflows/{id}`: inspect one owner-scoped workflow and its audit trail.
+- `POST /api/agent-workflows/{id}/decision`: approve, reject, or request a full revision.
 
-See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for job contracts and [docs/api/part-6-cv-ranking.md](docs/api/part-6-cv-ranking.md) for CV and ranking behavior.
+See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for job contracts, [docs/api/part-6-cv-ranking.md](docs/api/part-6-cv-ranking.md) for CV and ranking behavior, and [docs/api/part-7-agentic-workflow.md](docs/api/part-7-agentic-workflow.md) for the controlled workflow.
 
 ## Run the React web app
 
@@ -109,7 +113,7 @@ npm run dev
 
 Open `http://localhost:5173`. The development API allows this origin by default. Set `VITE_API_BASE_URL` in `web/.env.local` if the API uses another address.
 
-The web client supports both roles. Job Seekers can upload and confirm a CV and inspect explainable recommendations; application pages remain reserved until Part 8. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
+The web client supports both roles. Job Seekers can upload and confirm a CV, inspect explainable recommendations, and start or review controlled AI workflows. Application pages remain reserved until Part 8. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
 
 ## Run the Flutter mobile app
 
@@ -121,7 +125,7 @@ flutter pub get
 flutter run
 ```
 
-Android emulators use `http://10.0.2.2:5251` by default. For a physical device or another API address, pass `--dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251`. The mobile app supports CV upload/review and the same explainable recommendations as the web app. See [docs/api/part-5-flutter-mobile.md](docs/api/part-5-flutter-mobile.md) for its architecture.
+Android emulators use `http://10.0.2.2:5251` by default. For a physical device or another API address, pass `--dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251`. The mobile app supports CV upload/review, explainable recommendations, and the same controlled workflow and approval actions as the web app. See [docs/api/part-5-flutter-mobile.md](docs/api/part-5-flutter-mobile.md) for its architecture.
 
 ## Run the tests
 
@@ -148,6 +152,9 @@ PostgreSQL integration tests run automatically in GitHub Actions. To run them lo
 - JWT signing keys and database credentials are supplied through environment variables and are never committed.
 - Uploaded CVs are checked for size, extension, content type, and PDF/DOCX signature, then stored with generated names outside public web roots.
 - Extracted data cannot affect ranking until the Job Seeker reviews and confirms it.
+- Agent tools are fixed by server-side allow-lists and use structured input/output contracts.
+- Shortlist publication is impossible until the owner explicitly approves a validated proposal.
+- Workflow logs contain structured audit evidence, not hidden model reasoning or secrets.
 
 ## Roles in the current scope
 

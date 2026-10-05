@@ -8,6 +8,7 @@ import { JobSeekerDashboardPage } from './pages/job-seeker/JobSeekerDashboardPag
 import { JobSeekerProfilePage } from './pages/job-seeker/JobSeekerProfilePage';
 import { CvPage } from './pages/job-seeker/CvPage';
 import { RecommendationsPage } from './pages/job-seeker/RecommendationsPage';
+import { AgentWorkflowsPage } from './pages/job-seeker/AgentWorkflowsPage';
 import { JobDetailsPage } from './pages/jobs/JobDetailsPage';
 import { JobsPage } from './pages/jobs/JobsPage';
 import { CompanyProfilePage } from './pages/recruiter/CompanyProfilePage';
@@ -39,6 +40,7 @@ export function Application() {
             <Route path="profile" element={<JobSeekerProfilePage />} />
             <Route path="cv" element={<CvPage />} />
             <Route path="recommendations" element={<RecommendationsPage />} />
+            <Route path="agent-workflows" element={<AgentWorkflowsPage />} />
             <Route path="applications" element={<ComingSoonPage />} />
           </Route>
         </Route>

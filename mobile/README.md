@@ -27,4 +27,4 @@ flutter analyze
 flutter test
 ```
 
-The Job Seeker can register, authenticate, manage a profile, browse jobs, upload and review a PDF/DOCX CV, and inspect deterministic recommendations with score evidence. Application submission and tracking remain explicit placeholders for Part 8.
+The Job Seeker can register, authenticate, manage a profile, browse jobs, upload and review a PDF/DOCX CV, inspect deterministic recommendations with score evidence, and start, inspect, approve, reject, or revise the shared controlled AI workflow. Application submission and tracking remain explicit placeholders for Part 8.

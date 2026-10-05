@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" />
+    <ProjectReference Include="..\NextRoleAI.AgenticAI\NextRoleAI.AgenticAI.csproj" />
     <ProjectReference Include="..\NextRoleAI.Application\NextRoleAI.Application.csproj" />
     <ProjectReference Include="..\NextRoleAI.Domain\NextRoleAI.Domain.csproj" />
   </ItemGroup>

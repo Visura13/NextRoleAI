@@ -6,6 +6,7 @@ import 'app.dart';
 import 'core/api/api_client.dart';
 import 'core/config/app_config.dart';
 import 'core/storage/session_storage.dart';
+import 'features/agent_workflows/data/agent_workflows_repository.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/state/auth_view_model.dart';
 import 'features/cv/data/cv_file_picker.dart';
@@ -41,6 +42,7 @@ void main() {
       cvFilePicker: DeviceCvFilePicker(),
       cvRepository: CvRepository(apiClient),
       recommendationsRepository: RecommendationsRepository(apiClient),
+      agentWorkflowsRepository: AgentWorkflowsRepository(apiClient),
     ),
   );
   unawaited(authViewModel.initialize());
