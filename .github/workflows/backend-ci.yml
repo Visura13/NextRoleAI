@@ -1,0 +1,34 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.401
+          cache: true
+          cache-dependency-path: backend/**/packages.lock.json
+
+      - name: Restore dependencies
+        run: dotnet restore NextRoleAI.sln
+
+      - name: Build
+        run: dotnet build NextRoleAI.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test NextRoleAI.sln --configuration Release --no-build --collect:"XPlat Code Coverage"

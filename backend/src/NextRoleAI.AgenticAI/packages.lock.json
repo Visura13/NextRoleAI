@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "nextroleai.application": {
+        "type": "Project",
+        "dependencies": {
+          "NextRoleAI.Domain": "[1.0.0, )"
+        }
+      },
+      "nextroleai.domain": {
+        "type": "Project"
+      }
+    }
+  }
+}

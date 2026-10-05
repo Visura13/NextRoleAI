@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\NextRoleAI.Application\NextRoleAI.Application.csproj" />
+    <ProjectReference Include="..\NextRoleAI.Infrastructure\NextRoleAI.Infrastructure.csproj" />
+    <ProjectReference Include="..\NextRoleAI.AgenticAI\NextRoleAI.AgenticAI.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

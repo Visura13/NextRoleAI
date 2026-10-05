@@ -1,0 +1,35 @@
+# Build output
+**/bin/
+**/obj/
+TestResults/
+coverage/
+
+# Local development tools and temporary files
+.tools/
+tmp/
+
+# IDE settings
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+secrets.json
+
+# Frontend and mobile generated files
+node_modules/
+dist/
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Operating system files
+.DS_Store
+Thumbs.db
