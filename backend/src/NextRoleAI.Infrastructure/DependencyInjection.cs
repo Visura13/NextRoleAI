@@ -6,9 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NextRoleAI.Application.Authentication;
+using NextRoleAI.Application.Jobs;
+using NextRoleAI.Application.Profiles;
 using NextRoleAI.Infrastructure.Authentication;
 using NextRoleAI.Infrastructure.Identity;
+using NextRoleAI.Infrastructure.Jobs;
 using NextRoleAI.Infrastructure.Persistence;
+using NextRoleAI.Infrastructure.Profiles;
 
 namespace NextRoleAI.Infrastructure;
 
@@ -94,6 +98,8 @@ public static class DependencyInjection
 
         services.AddScoped<JwtTokenGenerator>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IProfileService, ProfileService>();
+        services.AddScoped<IJobService, JobService>();
 
         return services;
     }

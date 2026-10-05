@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NextRoleAI.Domain.Jobs;
+using NextRoleAI.Domain.Profiles;
 using NextRoleAI.Infrastructure.Identity;
 
 namespace NextRoleAI.Infrastructure.Persistence;
@@ -8,6 +10,16 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
+    public DbSet<JobSeekerProfile> JobSeekerProfiles => Set<JobSeekerProfile>();
+
+    public DbSet<JobSeekerSkill> JobSeekerSkills => Set<JobSeekerSkill>();
+
+    public DbSet<CompanyProfile> CompanyProfiles => Set<CompanyProfile>();
+
+    public DbSet<JobPosting> JobPostings => Set<JobPosting>();
+
+    public DbSet<JobSkill> JobSkills => Set<JobSkill>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -33,6 +45,84 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.HasOne(token => token.User)
                 .WithMany(user => user.RefreshTokens)
                 .HasForeignKey(token => token.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<JobSeekerProfile>(entity =>
+        {
+            entity.ToTable("JobSeekerProfiles");
+            entity.HasKey(profile => profile.Id);
+            entity.Property(profile => profile.UserId).IsRequired();
+            entity.Property(profile => profile.Headline).HasMaxLength(160).IsRequired();
+            entity.Property(profile => profile.Summary).HasMaxLength(2000).IsRequired();
+            entity.Property(profile => profile.Location).HasMaxLength(150).IsRequired();
+            entity.Property(profile => profile.PreferredJobTitle).HasMaxLength(150).IsRequired();
+            entity.HasIndex(profile => profile.UserId).IsUnique();
+            entity.HasOne<ApplicationUser>()
+                .WithOne()
+                .HasForeignKey<JobSeekerProfile>(profile => profile.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<JobSeekerSkill>(entity =>
+        {
+            entity.ToTable("JobSeekerSkills");
+            entity.HasKey(skill => skill.Id);
+            entity.Property(skill => skill.Name).HasMaxLength(100).IsRequired();
+            entity.HasIndex(skill => new { skill.JobSeekerProfileId, skill.Name }).IsUnique();
+            entity.HasOne(skill => skill.JobSeekerProfile)
+                .WithMany(profile => profile.Skills)
+                .HasForeignKey(skill => skill.JobSeekerProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<CompanyProfile>(entity =>
+        {
+            entity.ToTable("CompanyProfiles");
+            entity.HasKey(profile => profile.Id);
+            entity.Property(profile => profile.RecruiterUserId).IsRequired();
+            entity.Property(profile => profile.Name).HasMaxLength(200).IsRequired();
+            entity.Property(profile => profile.Description).HasMaxLength(3000).IsRequired();
+            entity.Property(profile => profile.Location).HasMaxLength(150).IsRequired();
+            entity.Property(profile => profile.WebsiteUrl).HasMaxLength(500);
+            entity.HasIndex(profile => profile.RecruiterUserId).IsUnique();
+            entity.HasOne<ApplicationUser>()
+                .WithOne()
+                .HasForeignKey<CompanyProfile>(profile => profile.RecruiterUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<JobPosting>(entity =>
+        {
+            entity.ToTable("JobPostings");
+            entity.HasKey(job => job.Id);
+            entity.Property(job => job.Title).HasMaxLength(200).IsRequired();
+            entity.Property(job => job.Description).HasMaxLength(8000).IsRequired();
+            entity.Property(job => job.Location).HasMaxLength(150).IsRequired();
+            entity.Property(job => job.EmploymentType).HasConversion<string>().HasMaxLength(30);
+            entity.Property(job => job.WorkMode).HasConversion<string>().HasMaxLength(30);
+            entity.Property(job => job.Status).HasConversion<string>().HasMaxLength(30);
+            entity.Property(job => job.SalaryMinimum).HasPrecision(18, 2);
+            entity.Property(job => job.SalaryMaximum).HasPrecision(18, 2);
+            entity.Property(job => job.SalaryCurrency).HasMaxLength(3);
+            entity.HasIndex(job => new { job.Status, job.PublishedAtUtc });
+            entity.HasIndex(job => new { job.CompanyProfileId, job.UpdatedAtUtc });
+            entity.HasOne(job => job.CompanyProfile)
+                .WithMany(profile => profile.JobPostings)
+                .HasForeignKey(job => job.CompanyProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<JobSkill>(entity =>
+        {
+            entity.ToTable("JobSkills");
+            entity.HasKey(skill => skill.Id);
+            entity.Property(skill => skill.Name).HasMaxLength(100).IsRequired();
+            entity.HasIndex(skill => new { skill.JobPostingId, skill.Name }).IsUnique();
+            entity.HasIndex(skill => skill.Name);
+            entity.HasOne(skill => skill.JobPosting)
+                .WithMany(job => job.Skills)
+                .HasForeignKey(skill => skill.JobPostingId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

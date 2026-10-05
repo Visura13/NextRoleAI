@@ -1,9 +1,12 @@
+using System.Text.Json.Serialization;
 using NextRoleAI.Infrastructure;
 using NextRoleAI.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -22,7 +25,9 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 await app.Services.InitialiseDatabaseAsync(
-    app.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"));
+    app.Configuration.GetValue<bool>("Database:ApplyMigrationsOnStartup"),
+    app.Environment.IsDevelopment() &&
+        app.Configuration.GetValue<bool>("SeedData:Enabled"));
 
 await app.RunAsync();
 

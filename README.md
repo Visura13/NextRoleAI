@@ -4,7 +4,7 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 2 adds PostgreSQL persistence, Entity Framework Core migrations, ASP.NET Core Identity, JWT access tokens, rotating refresh tokens, Job Seeker and Recruiter registration, login, logout, current-user lookup, role policies, and PostgreSQL integration tests. Profiles, job postings, frontend clients, and Agentic AI behavior remain intentionally deferred.
+Part 3 adds Job Seeker and company profiles, normalized skills, recruiter-owned job postings, controlled publishing and closing, and a public searchable job catalog. React, Flutter, CV processing, job ranking, applications, and Agentic AI behavior remain intentionally deferred.
 
 ## Planned architecture
 
@@ -26,6 +26,7 @@ React and Flutter will use the same API, identity, roles, permissions, and busin
 - `NextRoleAI.Infrastructure`: PostgreSQL, identity, file storage, and external providers.
 - `NextRoleAI.AgenticAI`: agent orchestration, tools, structured state, and safety controls.
 - `NextRoleAI.Api.Tests`: automated backend tests.
+- `NextRoleAI.IntegrationTests`: real PostgreSQL API and authorization tests.
 
 ## Prerequisites
 
@@ -48,6 +49,14 @@ Configure the API process in the current PowerShell session:
 ```powershell
 $env:ConnectionStrings__DefaultConnection = "Host=localhost;Port=5432;Database=nextroleai;Username=nextroleai;Password=YOUR_LOCAL_PASSWORD"
 $env:Jwt__SigningKey = "YOUR_RANDOM_SIGNING_KEY_WITH_AT_LEAST_32_CHARACTERS"
+```
+
+Optional local demo data is disabled by default. To create a demo Recruiter, company, and published job in the Development environment, also set:
+
+```powershell
+$env:SeedData__Enabled = "true"
+$env:SeedData__RecruiterEmail = "demo.recruiter@example.com"
+$env:SeedData__RecruiterPassword = "YOUR_STRONG_LOCAL_ONLY_PASSWORD"
 ```
 
 Restore local tools and apply migrations:
@@ -74,6 +83,15 @@ The API exposes:
 - `POST /api/auth/refresh`: rotate a refresh token and issue a new token pair.
 - `POST /api/auth/logout`: revoke a refresh token.
 - `GET /api/auth/me`: return the authenticated user's shared identity and role.
+- `GET|PUT /api/profiles/job-seeker`: read or update the current Job Seeker profile.
+- `GET|PUT /api/profiles/company`: read or update the current Recruiter's company.
+- `GET|POST /api/recruiter/jobs`: list or create the current Recruiter's jobs.
+- `GET|PUT|DELETE /api/recruiter/jobs/{id}`: manage a recruiter-owned job.
+- `PATCH /api/recruiter/jobs/{id}/status`: publish or close a recruiter-owned job.
+- `GET /api/jobs`: search, filter, sort, and paginate open published jobs.
+- `GET /api/jobs/{id}`: retrieve an open published job.
+
+See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for request shapes, filters, and status rules.
 
 ## Run the tests
 

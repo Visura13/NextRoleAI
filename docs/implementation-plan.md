@@ -11,7 +11,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 2 - PostgreSQL and authentication
 
-- Status: complete on `feature/part-2-authentication`
+- Status: complete and merged
 - PostgreSQL and Entity Framework Core
 - ASP.NET Core Identity with JobSeeker and Recruiter roles
 - JWT access tokens and refresh-token rotation
@@ -20,7 +20,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 3 - Profiles and recruiter job management
 
-- Status: not started
+- Status: complete on `feature/part-3-job-management`
 - Job-seeker and recruiter/company profiles
 - Job-posting entities, skills, validation, ownership, and status
 - CRUD, search, filtering, sorting, and pagination
