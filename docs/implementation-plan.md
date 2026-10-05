@@ -37,7 +37,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 5 - Flutter job-seeker application
 
-- Status: complete on `feature/part-5-flutter-mobile`
+- Status: complete and merged
 - Shared authentication with secure token storage
 - Job Seeker registration, login, logout, and protected navigation
 - Native CV document picker with type and size validation
@@ -47,7 +47,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 6 - CV processing and deterministic ranking
 
-- Status: not started
+- Status: complete on `feature/part-6-cv-ranking`
 - Secure CV upload and storage abstraction
 - Structured CV profile and user correction flow
 - Testable weighted job-matching engine

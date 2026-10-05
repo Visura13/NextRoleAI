@@ -21,6 +21,8 @@ export function PortalLayout({ role }: { role: 'JobSeeker' | 'Recruiter' }) {
           ) : (
             <>
               <NavLink to="/job-seeker/profile">My profile</NavLink>
+              <NavLink to="/job-seeker/cv">My CV</NavLink>
+              <NavLink to="/job-seeker/recommendations">Recommendations</NavLink>
               <NavLink to="/jobs">Find jobs</NavLink>
               <NavLink to="/job-seeker/applications">Applications</NavLink>
             </>

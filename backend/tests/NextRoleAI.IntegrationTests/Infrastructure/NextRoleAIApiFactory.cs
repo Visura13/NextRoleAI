@@ -5,6 +5,10 @@ namespace NextRoleAI.IntegrationTests.Infrastructure;
 public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
 {
     private readonly Dictionary<string, string?> originalEnvironment = [];
+    private readonly string cvStoragePath = Path.Combine(
+        Path.GetTempPath(),
+        "NextRoleAI-tests",
+        Guid.NewGuid().ToString("N"));
 
     public NextRoleAIApiFactory()
     {
@@ -21,6 +25,7 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
             "integration-tests-only-signing-key-with-more-than-32-characters");
         SetEnvironmentVariable("Jwt__AccessTokenMinutes", "15");
         SetEnvironmentVariable("Jwt__RefreshTokenDays", "7");
+        SetEnvironmentVariable("CvStorage__RootPath", cvStoragePath);
     }
 
     protected override void Dispose(bool disposing)
@@ -34,6 +39,11 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
             foreach (var (name, value) in originalEnvironment)
             {
                 Environment.SetEnvironmentVariable(name, value);
+            }
+
+            if (Directory.Exists(cvStoragePath))
+            {
+                Directory.Delete(cvStoragePath, recursive: true);
             }
         }
     }

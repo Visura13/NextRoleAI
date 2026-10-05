@@ -9,8 +9,10 @@ The Flutter application in `mobile/` is the Job Seeker's mobile channel. It uses
 - Protected declarative routes and a responsive bottom-navigation shell.
 - Job search and filters, pagination, job details, and explicit API error/empty/loading states.
 - Job Seeker profile creation and editing.
-- Native CV document selection with extension and size validation.
-- Reserved recommendation and application-status states that name their backend dependencies instead of presenting fake data.
+- Native PDF/DOCX selection and upload with extension and size validation.
+- Review, correction, and confirmation of the API-extracted CV profile.
+- Explainable ranked recommendations using the shared Part 6 API contract.
+- A reserved application-status state that names its Part 8 dependency instead of presenting fake data.
 
 ## Architecture
 
@@ -40,6 +42,6 @@ flutter run --dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251
 
 The API must listen on an address reachable from the device. Never embed production credentials or signing secrets in `--dart-define` values.
 
-## Deferred backend-dependent behavior
+## Part 6 extension
 
-Part 5 proves the native file picker and retains only the selected file's display metadata in memory. File bytes are not uploaded or persisted because the validated CV storage and processing endpoint belongs to Part 6. Ranked recommendations begin in Part 6, and application submission/history begin in Part 8.
+Part 6 extends the same repository/view-model boundaries with multipart upload, extracted profile review, deletion, and recommendation models. File bytes stay in memory only long enough to send the upload; the API owns private persistence. See `part-6-cv-ranking.md` for validation, storage, and scoring rules. Application submission and history begin in Part 8.

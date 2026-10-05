@@ -58,7 +58,7 @@ export function JobSeekerProfilePage() {
 
   return (
     <div className="page-stack">
-      <header className="portal-header"><p className="eyebrow">Job seeker profile</p><h1>Shape the signal recruiters and matching will see.</h1><p>Use concrete experience and comma-separated skills. CV upload and correction will arrive in Part 6.</p></header>
+      <header className="portal-header"><p className="eyebrow">Job seeker profile</p><h1>Shape the signal recruiters and matching will see.</h1><p>Preferences here complement the skills and experience in your confirmed CV profile.</p></header>
       <form className="surface-form" onSubmit={submit}>
         {feedback && <Notice kind={feedback.kind}>{feedback.message}</Notice>}
         <div className="form-grid"><label>Professional headline<input maxLength={160} value={form.headline} onChange={(event) => setForm({ ...form, headline: event.target.value })} placeholder="Backend engineer focused on reliable systems" /></label><label>Preferred job title<input maxLength={150} value={form.preferredJobTitle} onChange={(event) => setForm({ ...form, preferredJobTitle: event.target.value })} placeholder="Software Engineer" /></label></div>

@@ -100,3 +100,48 @@ export interface JobPayload {
   closesAtUtc: string | null;
   skills: JobSkill[];
 }
+
+export type CvProcessingStatus = 'NeedsReview' | 'Confirmed' | 'Failed';
+
+export interface CvProfile {
+  id: string;
+  originalFileName: string;
+  contentType: string;
+  sizeBytes: number;
+  sha256Checksum: string;
+  status: CvProcessingStatus;
+  candidateName: string;
+  email: string;
+  phone: string;
+  location: string;
+  currentJobTitle: string;
+  professionalSummary: string;
+  yearsExperience: number;
+  skills: string[];
+  failureReason: string | null;
+  createdAtUtc: string;
+  updatedAtUtc: string;
+}
+
+export interface MatchBreakdown {
+  requiredSkills: number;
+  preferredSkills: number;
+  title: number;
+  experience: number;
+  location: number;
+  total: number;
+}
+
+export interface JobRecommendation {
+  job: Job;
+  score: number;
+  breakdown: MatchBreakdown;
+  matchedSkills: string[];
+  missingRequiredSkills: string[];
+  reasons: string[];
+  algorithmVersion: string;
+}
+
+export interface RecommendationResponse {
+  items: JobRecommendation[];
+}

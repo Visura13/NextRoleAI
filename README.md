@@ -4,7 +4,7 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 5 adds the Flutter Job Seeker application: shared registration and authentication, secure session storage, protected navigation, profile editing, public job discovery, native CV document selection, and mobile tests. CV upload/processing, job ranking, applications, and Agentic AI behavior remain intentionally deferred to their planned increments.
+Part 6 adds secure PDF/DOCX upload, local private file storage, reviewable CV extraction, and deterministic explainable job ranking across the React and Flutter Job Seeker clients. Applications and controlled Agentic AI behavior remain intentionally deferred to their planned increments.
 
 ## Planned architecture
 
@@ -52,6 +52,8 @@ $env:ConnectionStrings__DefaultConnection = "Host=localhost;Port=5432;Database=n
 $env:Jwt__SigningKey = "YOUR_RANDOM_SIGNING_KEY_WITH_AT_LEAST_32_CHARACTERS"
 ```
 
+CV files default to the operating system's private application-data directory, outside this repository. To use another private development directory, optionally set `CvStorage__RootPath` to an absolute path. Do not point it at `web/`, `wwwroot/`, or another publicly served directory.
+
 Optional local demo data is disabled by default. To create a demo Recruiter, company, and published job in the Development environment, also set:
 
 ```powershell
@@ -91,8 +93,11 @@ The API exposes:
 - `PATCH /api/recruiter/jobs/{id}/status`: publish or close a recruiter-owned job.
 - `GET /api/jobs`: search, filter, sort, and paginate open published jobs.
 - `GET /api/jobs/{id}`: retrieve an open published job.
+- `GET|POST|DELETE /api/cv`: read, upload/replace, or delete the Job Seeker's private CV.
+- `PUT /api/cv/profile`: correct and confirm the extracted CV profile.
+- `GET /api/recommendations`: rank published jobs for a confirmed CV with evidence and a score breakdown.
 
-See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for request shapes, filters, and status rules.
+See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for job contracts and [docs/api/part-6-cv-ranking.md](docs/api/part-6-cv-ranking.md) for CV and ranking behavior.
 
 ## Run the React web app
 
@@ -104,7 +109,7 @@ npm run dev
 
 Open `http://localhost:5173`. The development API allows this origin by default. Set `VITE_API_BASE_URL` in `web/.env.local` if the API uses another address.
 
-The web client supports both roles. Application pages clearly remain reserved until the application, audit, and notification workflow is implemented in Part 8. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
+The web client supports both roles. Job Seekers can upload and confirm a CV and inspect explainable recommendations; application pages remain reserved until Part 8. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
 
 ## Run the Flutter mobile app
 
@@ -116,7 +121,7 @@ flutter pub get
 flutter run
 ```
 
-Android emulators use `http://10.0.2.2:5251` by default. For a physical device or another API address, pass `--dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251`. See [docs/api/part-5-flutter-mobile.md](docs/api/part-5-flutter-mobile.md) for the implemented journeys and architecture.
+Android emulators use `http://10.0.2.2:5251` by default. For a physical device or another API address, pass `--dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251`. The mobile app supports CV upload/review and the same explainable recommendations as the web app. See [docs/api/part-5-flutter-mobile.md](docs/api/part-5-flutter-mobile.md) for its architecture.
 
 ## Run the tests
 
@@ -141,6 +146,8 @@ PostgreSQL integration tests run automatically in GitHub Actions. To run them lo
 - Refresh tokens are random, stored only as SHA-256 hashes, rotated on use, and revoked on logout.
 - Reuse of a rotated refresh token revokes the user's remaining active sessions.
 - JWT signing keys and database credentials are supplied through environment variables and are never committed.
+- Uploaded CVs are checked for size, extension, content type, and PDF/DOCX signature, then stored with generated names outside public web roots.
+- Extracted data cannot affect ranking until the Job Seeker reviews and confirms it.
 
 ## Roles in the current scope
 

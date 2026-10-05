@@ -114,7 +114,9 @@ class ApiClient {
 
   private async fetch(path: string, init: RequestInit, authenticated: boolean) {
     const headers = new Headers(init.headers);
-    if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+    if (init.body && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
     if (authenticated && this.session) headers.set('Authorization', `Bearer ${this.session.accessToken}`);
     return fetch(`${API_BASE_URL}${path}`, { ...init, headers });
   }

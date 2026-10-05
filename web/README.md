@@ -2,6 +2,8 @@
 
 The role-aware React and TypeScript client for NextRoleAI. It uses Vite, React Router, and SWR and consumes the ASP.NET Core API.
 
+Job Seekers can manage their profile, browse jobs, upload and confirm a CV, and inspect explainable ranked recommendations. Recruiters can manage their company and job postings.
+
 ```powershell
 npm install
 npm run dev

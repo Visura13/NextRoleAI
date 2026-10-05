@@ -6,7 +6,7 @@ import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/splash_screen.dart';
 import '../features/auth/state/auth_view_model.dart';
-import '../features/cv/presentation/cv_screen.dart';
+import '../features/cv/presentation/cv_workspace_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/reserved_screen.dart';
 import '../features/jobs/data/jobs_repository.dart';
@@ -14,6 +14,7 @@ import '../features/jobs/presentation/job_details_screen.dart';
 import '../features/jobs/presentation/jobs_screen.dart';
 import '../features/jobs/state/jobs_view_model.dart';
 import '../features/profile/presentation/profile_screen.dart';
+import '../features/recommendations/presentation/recommendations_screen.dart';
 import '../shell/app_shell.dart';
 
 GoRouter createAppRouter({
@@ -62,14 +63,13 @@ GoRouter createAppRouter({
         child: const JobDetailsScreen(),
       ),
     ),
-    GoRoute(path: '/cv', builder: (context, state) => const CvScreen()),
+    GoRoute(
+      path: '/cv',
+      builder: (context, state) => const CvWorkspaceScreen(),
+    ),
     GoRoute(
       path: '/recommendations',
-      builder: (context, state) => const ReservedScreen(
-        title: 'Ranked recommendations',
-        message: 'Part 6 will add CV processing, deterministic matching, explanations, and agent run status.',
-        icon: Icons.auto_awesome_outlined,
-      ),
+      builder: (context, state) => const RecommendationsScreen(),
     ),
     GoRoute(
       path: '/applications',

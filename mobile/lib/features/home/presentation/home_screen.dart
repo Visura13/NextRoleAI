@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Choose a document securely from your device. Processing and explainable ranking arrive in Part 6.',
+                    'Upload a PDF or DOCX, review the extracted profile, and keep control of the data used for matching.',
                     style: TextStyle(color: Color(0xFFC4D2CC), height: 1.5),
                   ),
                   const SizedBox(height: 18),
@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                       backgroundColor: AppTheme.lime,
                       foregroundColor: AppTheme.forestDeep,
                     ),
-                    child: const Text('Choose my CV'),
+                    child: const Text('Review my CV'),
                   ),
                 ],
               ),
@@ -107,7 +107,7 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.auto_awesome_outlined,
               title: 'Ranked recommendations',
               subtitle:
-                  'Reserved for the deterministic matching workflow in Part 6.',
+                  'Compare transparent scores and missing required skills.',
               onTap: () => context.push('/recommendations'),
             ),
             _ActionCard(

@@ -27,4 +27,4 @@ flutter analyze
 flutter test
 ```
 
-Part 5 includes Job Seeker registration, login/logout, secure session storage, profile editing, public job search and filtering, job details, and native CV document selection. CV upload/ranking and applications remain explicit placeholders for Parts 6 and 8.
+The Job Seeker can register, authenticate, manage a profile, browse jobs, upload and review a PDF/DOCX CV, and inspect deterministic recommendations with score evidence. Application submission and tracking remain explicit placeholders for Part 8.
