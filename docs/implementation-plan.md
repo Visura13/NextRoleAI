@@ -28,7 +28,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 4 - React web application
 
-- Status: complete on `feature/part-4-react-web`
+- Status: complete and merged
 - Shared authentication and protected routes
 - Job-seeker profile and public job discovery screens
 - Recruiter company and job-management screens
@@ -37,10 +37,12 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 5 - Flutter job-seeker application
 
-- Status: not started
+- Status: complete on `feature/part-5-flutter-mobile`
 - Shared authentication with secure token storage
-- CV file picker or camera capture
-- Job browsing, recommendations, applications, and status tracking
+- Job Seeker registration, login, logout, and protected navigation
+- Native CV document picker with type and size validation
+- Shared profile editing and public job browsing, filtering, and details
+- Clear reserved screens for Part 6 recommendations and Part 8 applications
 - Mobile validation and widget tests
 
 ## Part 6 - CV processing and deterministic ranking

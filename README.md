@@ -4,7 +4,7 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 4 adds the responsive React web application: shared Job Seeker and Recruiter authentication, role-protected workspaces, public job discovery, Job Seeker profiles, company profiles, and recruiter job management. Flutter, CV processing, job ranking, applications, and Agentic AI behavior remain intentionally deferred.
+Part 5 adds the Flutter Job Seeker application: shared registration and authentication, secure session storage, protected navigation, profile editing, public job discovery, native CV document selection, and mobile tests. CV upload/processing, job ranking, applications, and Agentic AI behavior remain intentionally deferred to their planned increments.
 
 ## Planned architecture
 
@@ -33,7 +33,7 @@ React and Flutter will use the same API, identity, roles, permissions, and busin
 - .NET 10 SDK
 - Node.js 24 and npm
 - PostgreSQL 17 or Docker Desktop
-- Flutter will be required in a later increment
+- Flutter 3.47.3 and an Android emulator or device
 
 ## Configure local development
 
@@ -106,6 +106,18 @@ Open `http://localhost:5173`. The development API allows this origin by default.
 
 The web client supports both roles. Application pages clearly remain reserved until the application, audit, and notification workflow is implemented in Part 8. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
 
+## Run the Flutter mobile app
+
+Start the API, then run:
+
+```powershell
+cd mobile
+flutter pub get
+flutter run
+```
+
+Android emulators use `http://10.0.2.2:5251` by default. For a physical device or another API address, pass `--dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251`. See [docs/api/part-5-flutter-mobile.md](docs/api/part-5-flutter-mobile.md) for the implemented journeys and architecture.
+
 ## Run the tests
 
 ```powershell
@@ -114,6 +126,10 @@ cd web
 npm run lint
 npm test
 npm run build
+cd ../mobile
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test
 ```
 
 PostgreSQL integration tests run automatically in GitHub Actions. To run them locally, set `NEXTROLEAI_TEST_CONNECTION_STRING` to a disposable PostgreSQL database before running the test command.
