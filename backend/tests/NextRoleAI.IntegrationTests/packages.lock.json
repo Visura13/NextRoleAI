@@ -603,6 +603,7 @@
           "DocumentFormat.OpenXml": "[3.5.1, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.12, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[10.0.12, )",
+          "NextRoleAI.AgenticAI": "[1.0.0, )",
           "NextRoleAI.Application": "[1.0.0, )",
           "NextRoleAI.Domain": "[1.0.0, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
