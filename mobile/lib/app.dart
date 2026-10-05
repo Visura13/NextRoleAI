@@ -5,11 +5,14 @@ import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/state/auth_view_model.dart';
 import 'features/cv/data/cv_file_picker.dart';
+import 'features/cv/data/cv_repository.dart';
 import 'features/cv/state/cv_selection_view_model.dart';
 import 'features/jobs/data/jobs_repository.dart';
 import 'features/jobs/state/jobs_view_model.dart';
 import 'features/profile/data/profile_repository.dart';
 import 'features/profile/state/profile_view_model.dart';
+import 'features/recommendations/data/recommendations_repository.dart';
+import 'features/recommendations/state/recommendations_view_model.dart';
 
 class NextRoleApp extends StatelessWidget {
   const NextRoleApp({
@@ -18,6 +21,8 @@ class NextRoleApp extends StatelessWidget {
     required this.jobsRepository,
     required this.profileRepository,
     required this.cvFilePicker,
+    required this.cvRepository,
+    required this.recommendationsRepository,
     super.key,
   });
 
@@ -26,6 +31,8 @@ class NextRoleApp extends StatelessWidget {
   final JobsDataSource jobsRepository;
   final ProfileDataSource profileRepository;
   final CvFilePicker cvFilePicker;
+  final CvDataSource cvRepository;
+  final RecommendationsDataSource recommendationsRepository;
 
   @override
   Widget build(BuildContext context) => MultiProvider(
@@ -35,7 +42,12 @@ class NextRoleApp extends StatelessWidget {
       ChangeNotifierProvider(
         create: (_) => ProfileViewModel(profileRepository),
       ),
-      ChangeNotifierProvider(create: (_) => CvSelectionViewModel(cvFilePicker)),
+      ChangeNotifierProvider(
+        create: (_) => CvSelectionViewModel(cvFilePicker, cvRepository),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => RecommendationsViewModel(recommendationsRepository),
+      ),
     ],
     child: MaterialApp.router(
       title: 'NextRoleAI',

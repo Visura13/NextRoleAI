@@ -68,7 +68,7 @@ class _JobsScreenState extends State<JobsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Search the shared catalog now. Explainable ranking arrives in Part 6.',
+                      'Search the shared catalog, or use Recommendations to rank it against your confirmed CV.',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),

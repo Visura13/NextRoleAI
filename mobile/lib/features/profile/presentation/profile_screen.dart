@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'This profile is shared with the web app and will support explainable job ranking in Part 6.',
+              'This profile is shared with the web app and contributes to your explainable job ranking.',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

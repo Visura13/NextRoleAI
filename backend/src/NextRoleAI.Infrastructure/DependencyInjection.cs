@@ -6,13 +6,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NextRoleAI.Application.Authentication;
+using NextRoleAI.Application.Cvs;
 using NextRoleAI.Application.Jobs;
 using NextRoleAI.Application.Profiles;
+using NextRoleAI.Application.Recommendations;
 using NextRoleAI.Infrastructure.Authentication;
+using NextRoleAI.Infrastructure.Cvs;
 using NextRoleAI.Infrastructure.Identity;
 using NextRoleAI.Infrastructure.Jobs;
 using NextRoleAI.Infrastructure.Persistence;
 using NextRoleAI.Infrastructure.Profiles;
+using NextRoleAI.Infrastructure.Recommendations;
 
 namespace NextRoleAI.Infrastructure;
 
@@ -46,6 +50,9 @@ public static class DependencyInjection
             .Bind(configuration.GetRequiredSection(JwtOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
+        services.AddOptions<CvStorageOptions>()
+            .Bind(configuration.GetSection(CvStorageOptions.SectionName));
 
         services.AddSingleton(TimeProvider.System);
 
@@ -100,6 +107,12 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IProfileService, ProfileService>();
         services.AddScoped<IJobService, JobService>();
+        services.AddSingleton<ICvFileStore, LocalCvFileStore>();
+        services.AddSingleton<ICvTextExtractor, CvTextExtractor>();
+        services.AddSingleton<ICvProfileParser, DeterministicCvProfileParser>();
+        services.AddScoped<ICvService, CvService>();
+        services.AddSingleton<IJobMatchScorer, DeterministicJobMatchScorer>();
+        services.AddScoped<IRecommendationService, RecommendationService>();
 
         return services;
     }

@@ -47,7 +47,7 @@ export function JobsPage() {
       <header className="page-hero page-hero--jobs">
         <p className="eyebrow">Opportunity, without the noise</p>
         <h1>Explore roles with the context that matters.</h1>
-        <p>Search published opportunities now. Personalized CV ranking will build on this catalog in Part 6.</p>
+        <p>Search every published opportunity, or open Recommendations to rank this catalog against your confirmed CV.</p>
       </header>
       <form className="filter-panel" onSubmit={submit}>
         <label>Keywords<input placeholder="Title, company, or skill" value={draft.search} onChange={(event) => setDraft({ ...draft, search: event.target.value })} /></label>

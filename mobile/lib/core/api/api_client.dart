@@ -62,6 +62,69 @@ class ApiClient {
     await _request('POST', path, body: body, authenticated: authenticated);
   }
 
+  Future<void> deleteEmpty(String path) async {
+    await _request('DELETE', path, authenticated: true);
+  }
+
+  Future<Map<String, dynamic>> postMultipart(
+    String path, {
+    required String fieldName,
+    required String fileName,
+    required List<int> bytes,
+    bool authenticated = true,
+  }) => _multipart(
+    path,
+    fieldName: fieldName,
+    fileName: fileName,
+    bytes: bytes,
+    authenticated: authenticated,
+  );
+
+  Future<Map<String, dynamic>> _multipart(
+    String path, {
+    required String fieldName,
+    required String fileName,
+    required List<int> bytes,
+    required bool authenticated,
+    bool allowRefresh = true,
+  }) async {
+    final request = http.MultipartRequest('POST', _baseUrl.resolve(path))
+      ..headers['Accept'] = 'application/json'
+      ..files.add(
+        http.MultipartFile.fromBytes(fieldName, bytes, filename: fileName),
+      );
+    if (authenticated) {
+      final session = await _sessionStorage.read();
+      if (session != null) {
+        request.headers['Authorization'] = 'Bearer ${session.accessToken}';
+      }
+    }
+    final streamed = await _httpClient
+        .send(request)
+        .timeout(
+          const Duration(seconds: 30),
+          onTimeout: () => throw const ApiException(
+            'The upload took too long to complete.',
+            statusCode: 408,
+          ),
+        );
+    final response = await http.Response.fromStream(streamed);
+    if (response.statusCode == 401 &&
+        authenticated &&
+        allowRefresh &&
+        await _refresh()) {
+      return _multipart(
+        path,
+        fieldName: fieldName,
+        fileName: fileName,
+        bytes: bytes,
+        authenticated: true,
+        allowRefresh: false,
+      );
+    }
+    return _decode(response);
+  }
+
   Future<Map<String, dynamic>> _request(
     String method,
     String path, {

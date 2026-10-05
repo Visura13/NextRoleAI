@@ -6,6 +6,8 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { JobSeekerDashboardPage } from './pages/job-seeker/JobSeekerDashboardPage';
 import { JobSeekerProfilePage } from './pages/job-seeker/JobSeekerProfilePage';
+import { CvPage } from './pages/job-seeker/CvPage';
+import { RecommendationsPage } from './pages/job-seeker/RecommendationsPage';
 import { JobDetailsPage } from './pages/jobs/JobDetailsPage';
 import { JobsPage } from './pages/jobs/JobsPage';
 import { CompanyProfilePage } from './pages/recruiter/CompanyProfilePage';
@@ -35,6 +37,8 @@ export function Application() {
           <Route path="job-seeker" element={<PortalLayout role="JobSeeker" />}>
             <Route index element={<JobSeekerDashboardPage />} />
             <Route path="profile" element={<JobSeekerProfilePage />} />
+            <Route path="cv" element={<CvPage />} />
+            <Route path="recommendations" element={<RecommendationsPage />} />
             <Route path="applications" element={<ComingSoonPage />} />
           </Route>
         </Route>

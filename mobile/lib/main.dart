@@ -9,8 +9,10 @@ import 'core/storage/session_storage.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/state/auth_view_model.dart';
 import 'features/cv/data/cv_file_picker.dart';
+import 'features/cv/data/cv_repository.dart';
 import 'features/jobs/data/jobs_repository.dart';
 import 'features/profile/data/profile_repository.dart';
+import 'features/recommendations/data/recommendations_repository.dart';
 import 'routing/app_router.dart';
 
 void main() {
@@ -37,6 +39,8 @@ void main() {
       jobsRepository: jobsRepository,
       profileRepository: ProfileRepository(apiClient),
       cvFilePicker: DeviceCvFilePicker(),
+      cvRepository: CvRepository(apiClient),
+      recommendationsRepository: RecommendationsRepository(apiClient),
     ),
   );
   unawaited(authViewModel.initialize());

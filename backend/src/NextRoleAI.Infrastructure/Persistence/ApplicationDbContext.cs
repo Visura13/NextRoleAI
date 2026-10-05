@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using NextRoleAI.Domain.Cvs;
 using NextRoleAI.Domain.Jobs;
 using NextRoleAI.Domain.Profiles;
 using NextRoleAI.Infrastructure.Identity;
@@ -20,6 +21,10 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<JobPosting> JobPostings => Set<JobPosting>();
 
     public DbSet<JobSkill> JobSkills => Set<JobSkill>();
+
+    public DbSet<CvDocument> CvDocuments => Set<CvDocument>();
+
+    public DbSet<CvSkill> CvSkills => Set<CvSkill>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -123,6 +128,46 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.HasOne(skill => skill.JobPosting)
                 .WithMany(job => job.Skills)
                 .HasForeignKey(skill => skill.JobPostingId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<CvDocument>(entity =>
+        {
+            entity.ToTable("CvDocuments");
+            entity.HasKey(document => document.Id);
+            entity.Property(document => document.UserId).IsRequired();
+            entity.Property(document => document.OriginalFileName).HasMaxLength(255).IsRequired();
+            entity.Property(document => document.StorageKey).HasMaxLength(100).IsRequired();
+            entity.Property(document => document.ContentType).HasMaxLength(150).IsRequired();
+            entity.Property(document => document.Sha256Checksum).HasMaxLength(64).IsRequired();
+            entity.Property(document => document.Status).HasConversion<string>().HasMaxLength(30);
+            entity.Property(document => document.ExtractedText).HasMaxLength(50_000).IsRequired();
+            entity.Property(document => document.CandidateName).HasMaxLength(150).IsRequired();
+            entity.Property(document => document.Email).HasMaxLength(254).IsRequired();
+            entity.Property(document => document.Phone).HasMaxLength(40).IsRequired();
+            entity.Property(document => document.Location).HasMaxLength(150).IsRequired();
+            entity.Property(document => document.CurrentJobTitle).HasMaxLength(150).IsRequired();
+            entity.Property(document => document.ProfessionalSummary).HasMaxLength(2000).IsRequired();
+            entity.Property(document => document.FailureReason).HasMaxLength(500);
+            entity.HasIndex(document => document.UserId).IsUnique();
+            entity.HasIndex(document => document.StorageKey).IsUnique();
+            entity.HasIndex(document => document.Sha256Checksum);
+            entity.HasOne<ApplicationUser>()
+                .WithOne()
+                .HasForeignKey<CvDocument>(document => document.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<CvSkill>(entity =>
+        {
+            entity.ToTable("CvSkills");
+            entity.HasKey(skill => skill.Id);
+            entity.Property(skill => skill.Name).HasMaxLength(100).IsRequired();
+            entity.HasIndex(skill => new { skill.CvDocumentId, skill.Name }).IsUnique();
+            entity.HasIndex(skill => skill.Name);
+            entity.HasOne(skill => skill.CvDocument)
+                .WithMany(document => document.Skills)
+                .HasForeignKey(skill => skill.CvDocumentId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

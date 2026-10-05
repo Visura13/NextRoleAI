@@ -7,6 +7,7 @@ coverage/
 # Local development tools and temporary files
 .tools/
 tmp/
+private-storage/
 
 # IDE settings
 .vs/

@@ -2,10 +2,14 @@ import 'package:nextroleai_mobile/core/storage/session_storage.dart';
 import 'package:nextroleai_mobile/features/auth/data/auth_repository.dart';
 import 'package:nextroleai_mobile/features/auth/models/auth_models.dart';
 import 'package:nextroleai_mobile/features/cv/data/cv_file_picker.dart';
+import 'package:nextroleai_mobile/features/cv/data/cv_repository.dart';
+import 'package:nextroleai_mobile/features/cv/models/cv_profile.dart';
 import 'package:nextroleai_mobile/features/jobs/data/jobs_repository.dart';
 import 'package:nextroleai_mobile/features/jobs/models/job_models.dart';
 import 'package:nextroleai_mobile/features/profile/data/profile_repository.dart';
 import 'package:nextroleai_mobile/features/profile/models/job_seeker_profile.dart';
+import 'package:nextroleai_mobile/features/recommendations/data/recommendations_repository.dart';
+import 'package:nextroleai_mobile/features/recommendations/models/recommendation.dart';
 
 AuthSession sampleSession({String accessToken = 'access-token'}) => AuthSession(
   user: const CurrentUser(
@@ -127,5 +131,82 @@ class FakeCvFilePicker implements CvFilePicker {
   Future<SelectedCv?> pick() async {
     if (error != null) throw error!;
     return result;
+  }
+}
+
+CvProfile sampleCvProfile({String status = 'NeedsReview'}) => CvProfile(
+  id: 'cv-1',
+  originalFileName: 'alex-cv.pdf',
+  contentType: 'application/pdf',
+  sizeBytes: 2048,
+  sha256Checksum:
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  status: status,
+  candidateName: 'Alex Morgan',
+  email: 'alex@example.com',
+  phone: '',
+  location: 'Colombo',
+  currentJobTitle: 'Flutter Engineer',
+  professionalSummary: 'Builds reliable mobile applications.',
+  yearsExperience: 3,
+  skills: const ['Dart', 'Flutter'],
+  updatedAtUtc: DateTime.utc(2030),
+);
+
+class FakeCvDataSource implements CvDataSource {
+  CvProfile? profile;
+  Object? error;
+  bool deleted = false;
+
+  @override
+  Future<CvProfile> confirm(CvProfileUpdate update) async {
+    if (error != null) throw error!;
+    return profile = sampleCvProfile(status: 'Confirmed');
+  }
+
+  @override
+  Future<void> delete() async {
+    if (error != null) throw error!;
+    deleted = true;
+    profile = null;
+  }
+
+  @override
+  Future<CvProfile?> get() async {
+    if (error != null) throw error!;
+    return profile;
+  }
+
+  @override
+  Future<CvProfile> upload(SelectedCv cv) async {
+    if (error != null) throw error!;
+    return profile = sampleCvProfile();
+  }
+}
+
+JobRecommendation sampleRecommendation() => JobRecommendation(
+  job: sampleJob(),
+  score: 92.5,
+  breakdown: const MatchBreakdown(
+    requiredSkills: 45,
+    preferredSkills: 12.5,
+    title: 15,
+    experience: 10,
+    location: 10,
+  ),
+  matchedSkills: const ['Flutter'],
+  missingRequiredSkills: const [],
+  reasons: const ['Matches 1 listed skill.'],
+  algorithmVersion: 'deterministic-v1',
+);
+
+class FakeRecommendationsDataSource implements RecommendationsDataSource {
+  List<JobRecommendation> items = [];
+  Object? error;
+
+  @override
+  Future<List<JobRecommendation>> getRecommendations() async {
+    if (error != null) throw error!;
+    return items;
   }
 }
