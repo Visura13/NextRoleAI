@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/register_screen.dart';
+import '../features/auth/presentation/splash_screen.dart';
+import '../features/auth/state/auth_view_model.dart';
+import '../features/cv/presentation/cv_screen.dart';
+import '../features/home/presentation/home_screen.dart';
+import '../features/home/presentation/reserved_screen.dart';
+import '../features/jobs/data/jobs_repository.dart';
+import '../features/jobs/presentation/job_details_screen.dart';
+import '../features/jobs/presentation/jobs_screen.dart';
+import '../features/jobs/state/jobs_view_model.dart';
+import '../features/profile/presentation/profile_screen.dart';
+import '../shell/app_shell.dart';
+
+GoRouter createAppRouter({
+  required AuthViewModel auth,
+  required JobsDataSource jobsRepository,
+}) => GoRouter(
+  initialLocation: '/splash',
+  refreshListenable: auth,
+  redirect: (context, state) {
+    final location = state.matchedLocation;
+    final isAuthRoute = location == '/login' || location == '/register';
+    switch (auth.status) {
+      case AuthStatus.initializing:
+        return location == '/splash' ? null : '/splash';
+      case AuthStatus.signedOut:
+        return isAuthRoute ? null : '/login';
+      case AuthStatus.signedIn:
+        return isAuthRoute || location == '/splash' ? '/home' : null;
+    }
+  },
+  routes: [
+    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+    ShellRoute(
+      builder: (context, state, child) =>
+          AppShell(location: state.uri.path, child: child),
+      routes: [
+        GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+        GoRoute(path: '/jobs', builder: (context, state) => const JobsScreen()),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfileScreen(),
+        ),
+      ],
+    ),
+    GoRoute(
+      path: '/jobs/:id',
+      builder: (context, state) => ChangeNotifierProvider(
+        create: (_) =>
+            JobDetailsViewModel(jobsRepository)
+              ..load(state.pathParameters['id']!),
+        child: const JobDetailsScreen(),
+      ),
+    ),
+    GoRoute(path: '/cv', builder: (context, state) => const CvScreen()),
+    GoRoute(
+      path: '/recommendations',
+      builder: (context, state) => const ReservedScreen(
+        title: 'Ranked recommendations',
+        message: 'Part 6 will add CV processing, deterministic matching, explanations, and agent run status.',
+        icon: Icons.auto_awesome_outlined,
+      ),
+    ),
+    GoRoute(
+      path: '/applications',
+      builder: (context, state) => const ReservedScreen(
+        title: 'Applications',
+        message: 'Part 8 will add application submission, recruiter decisions, audit history, and status tracking.',
+        icon: Icons.track_changes_outlined,
+      ),
+    ),
+  ],
+);
