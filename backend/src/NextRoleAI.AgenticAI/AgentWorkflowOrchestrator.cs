@@ -38,7 +38,6 @@ public sealed class AgentWorkflowOrchestrator(
             UpdatedAtUtc = now
         };
         await store.AddAsync(workflow, cancellationToken);
-        await store.SaveAsync(cancellationToken);
         await ExecuteCycleAsync(workflow, cancellationToken);
 
         var hydrated = await store.GetOwnedAsync(userId, workflow.Id, cancellationToken)
