@@ -10,7 +10,11 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    app.UseExceptionHandler();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
