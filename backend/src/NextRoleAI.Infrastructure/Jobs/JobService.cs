@@ -107,7 +107,17 @@ internal sealed class JobService(
             .ExecuteDeleteAsync(cancellationToken);
         Apply(job, input);
         job.UpdatedAtUtc = timeProvider.GetUtcNow();
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            throw new InvalidOperationException(
+                $"Job save concurrency entries: {DescribeEntries(exception)}",
+                exception);
+        }
+
         await transaction.CommitAsync(cancellationToken);
 
         return JobCommandResult.Success(ToResult(job));
@@ -302,6 +312,12 @@ internal sealed class JobService(
                 group.Any(skill => skill.IsRequired)))
             .OrderBy(skill => skill.Name, StringComparer.OrdinalIgnoreCase)
             .ToArray();
+
+    private static string DescribeEntries(DbUpdateConcurrencyException exception) =>
+        string.Join(
+            ", ",
+            exception.Entries.Select(entry =>
+                $"{entry.Metadata.ClrType.Name}:{entry.State}"));
 
     private static async Task<PagedResult<JobResult>> ToPageAsync(
         IOrderedQueryable<JobPosting> query,

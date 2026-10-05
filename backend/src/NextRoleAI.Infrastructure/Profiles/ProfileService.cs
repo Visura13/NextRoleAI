@@ -65,7 +65,17 @@ internal sealed class ProfileService(
             });
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            throw new InvalidOperationException(
+                $"Profile save concurrency entries: {DescribeEntries(exception)}",
+                exception);
+        }
+
         await transaction.CommitAsync(cancellationToken);
         return ToResult(profile);
     }
@@ -124,6 +134,12 @@ internal sealed class ProfileService(
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToArray();
+
+    private static string DescribeEntries(DbUpdateConcurrencyException exception) =>
+        string.Join(
+            ", ",
+            exception.Entries.Select(entry =>
+                $"{entry.Metadata.ClrType.Name}:{entry.State}"));
 
     private static JobSeekerProfileResult ToResult(JobSeekerProfile profile) =>
         new(
