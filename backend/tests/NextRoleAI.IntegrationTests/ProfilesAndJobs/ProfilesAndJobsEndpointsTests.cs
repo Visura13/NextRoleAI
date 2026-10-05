@@ -49,6 +49,24 @@ public sealed class ProfilesAndJobsEndpointsTests(NextRoleAIApiFactory factory)
         Assert.Contains("C#", profile.Skills);
         Assert.Contains("PostgreSQL", profile.Skills);
 
+        var replacementResponse = await client.PutAsJsonAsync(
+            "/api/profiles/job-seeker",
+            new UpdateJobSeekerProfileRequest(
+                "Senior Backend Developer",
+                "Builds reliable APIs and distributed systems.",
+                "Kandy",
+                "Senior Software Engineer",
+                4,
+                ["ASP.NET Core", "Docker"]));
+        Assert.Equal(HttpStatusCode.OK, replacementResponse.StatusCode);
+
+        var replacement = await replacementResponse.Content
+            .ReadFromJsonAsync<JobSeekerProfileResult>(JsonOptions);
+        Assert.NotNull(replacement);
+        Assert.Equal(2, replacement.Skills.Count);
+        Assert.DoesNotContain("C#", replacement.Skills);
+        Assert.Contains("Docker", replacement.Skills);
+
         var recruiterProfileResponse = await client.GetAsync("/api/profiles/company");
         Assert.Equal(HttpStatusCode.Forbidden, recruiterProfileResponse.StatusCode);
     }

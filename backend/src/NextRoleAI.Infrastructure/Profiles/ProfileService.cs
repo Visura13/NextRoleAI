@@ -26,6 +26,8 @@ internal sealed class ProfileService(
         JobSeekerProfileUpdate update,
         CancellationToken cancellationToken = default)
     {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(
+            cancellationToken);
         var now = timeProvider.GetUtcNow();
         var profile = await dbContext.JobSeekerProfiles
             .Include(candidate => candidate.Skills)
@@ -43,6 +45,14 @@ internal sealed class ProfileService(
         }
         else
         {
+            await dbContext.JobSeekerSkills
+                .Where(skill => skill.JobSeekerProfileId == profile.Id)
+                .ExecuteDeleteAsync(cancellationToken);
+            foreach (var skill in profile.Skills)
+            {
+                dbContext.Entry(skill).State = EntityState.Detached;
+            }
+
             profile.Skills.Clear();
         }
 
@@ -63,6 +73,7 @@ internal sealed class ProfileService(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         return ToResult(profile);
     }
 

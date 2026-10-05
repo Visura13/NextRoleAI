@@ -82,6 +82,8 @@ internal sealed class JobService(
         JobUpsert input,
         CancellationToken cancellationToken = default)
     {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(
+            cancellationToken);
         var job = await FindOwnedAsync(recruiterUserId, jobId, cancellationToken);
         if (job is null)
         {
@@ -95,10 +97,19 @@ internal sealed class JobService(
                 "Closed job postings cannot be edited.");
         }
 
+        await dbContext.JobSkills
+            .Where(skill => skill.JobPostingId == job.Id)
+            .ExecuteDeleteAsync(cancellationToken);
+        foreach (var skill in job.Skills)
+        {
+            dbContext.Entry(skill).State = EntityState.Detached;
+        }
+
         job.Skills.Clear();
         Apply(job, input);
         job.UpdatedAtUtc = timeProvider.GetUtcNow();
         await dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
 
         return JobCommandResult.Success(ToResult(job));
     }
