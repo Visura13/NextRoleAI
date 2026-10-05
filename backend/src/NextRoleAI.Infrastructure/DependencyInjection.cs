@@ -46,9 +46,7 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
 
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(
-                connectionString,
-                npgsql => npgsql.EnableRetryOnFailure(3)));
+            options.UseNpgsql(connectionString));
 
         services.AddIdentityCore<ApplicationUser>(options =>
             {
