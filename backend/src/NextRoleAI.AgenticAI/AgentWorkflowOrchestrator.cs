@@ -101,7 +101,7 @@ public sealed class AgentWorkflowOrchestrator(
         }
 
         var now = timeProvider.GetUtcNow();
-        workflow.ApprovalDecisions.Add(new AgentApprovalDecision
+        store.AddApprovalDecision(new AgentApprovalDecision
         {
             Id = Guid.NewGuid(),
             WorkflowRunId = workflow.Id,
@@ -228,7 +228,7 @@ public sealed class AgentWorkflowOrchestrator(
 
             foreach (var validation in validations)
             {
-                workflow.ValidationResults.Add(new AgentValidationResult
+                store.AddValidationResult(new AgentValidationResult
                 {
                     Id = Guid.NewGuid(),
                     WorkflowRunId = workflow.Id,
@@ -249,7 +249,7 @@ public sealed class AgentWorkflowOrchestrator(
 
             foreach (var (item, index) in shortlist.Select((item, index) => (item, index)))
             {
-                workflow.ShortlistItems.Add(new AgentShortlistItem
+                store.AddShortlistItem(new AgentShortlistItem
                 {
                     Id = Guid.NewGuid(),
                     WorkflowRunId = workflow.Id,
@@ -338,7 +338,7 @@ public sealed class AgentWorkflowOrchestrator(
             InputJson = JsonSerializer.Serialize(input, JsonOptions),
             WorkflowRun = workflow
         };
-        workflow.Steps.Add(step);
+        store.AddStep(step);
         workflow.CurrentAgent = definition.AgentName;
         workflow.UpdatedAtUtc = timeProvider.GetUtcNow();
         await store.SaveAsync(cancellationToken);
@@ -418,7 +418,7 @@ public sealed class AgentWorkflowOrchestrator(
 
     private void AddApprovalGate(AgentWorkflowRun workflow)
     {
-        workflow.Steps.Add(new AgentWorkflowStep
+        store.AddStep(new AgentWorkflowStep
         {
             Id = Guid.NewGuid(),
             WorkflowRunId = workflow.Id,
@@ -463,7 +463,7 @@ public sealed class AgentWorkflowOrchestrator(
         var now = timeProvider.GetUtcNow();
         if (code is "UnsafeObjective" or "InvalidObjective")
         {
-            workflow.ValidationResults.Add(new AgentValidationResult
+            store.AddValidationResult(new AgentValidationResult
             {
                 Id = Guid.NewGuid(),
                 WorkflowRunId = workflow.Id,

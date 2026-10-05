@@ -13,6 +13,21 @@ internal sealed class AgentWorkflowStore(ApplicationDbContext dbContext)
         CancellationToken cancellationToken = default) =>
         await dbContext.AgentWorkflowRuns.AddAsync(workflow, cancellationToken);
 
+    public void AddStep(AgentWorkflowStep step) =>
+        dbContext.AgentWorkflowSteps.Add(step);
+
+    public void AddToolCall(AgentToolCall toolCall) =>
+        dbContext.AgentToolCalls.Add(toolCall);
+
+    public void AddValidationResult(AgentValidationResult validationResult) =>
+        dbContext.AgentValidationResults.Add(validationResult);
+
+    public void AddShortlistItem(AgentShortlistItem shortlistItem) =>
+        dbContext.AgentShortlistItems.Add(shortlistItem);
+
+    public void AddApprovalDecision(AgentApprovalDecision approvalDecision) =>
+        dbContext.AgentApprovalDecisions.Add(approvalDecision);
+
     public Task<AgentWorkflowRun?> GetOwnedAsync(
         string userId,
         Guid workflowId,

@@ -65,7 +65,7 @@ public sealed class AgentToolRouter
         }
 
         stopwatch.Stop();
-        step.ToolCalls.Add(new AgentToolCall
+        store.AddToolCall(new AgentToolCall
         {
             Id = Guid.NewGuid(),
             WorkflowStepId = step.Id,

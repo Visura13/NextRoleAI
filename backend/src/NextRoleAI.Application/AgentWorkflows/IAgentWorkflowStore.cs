@@ -8,6 +8,16 @@ public interface IAgentWorkflowStore
         AgentWorkflowRun workflow,
         CancellationToken cancellationToken = default);
 
+    void AddStep(AgentWorkflowStep step);
+
+    void AddToolCall(AgentToolCall toolCall);
+
+    void AddValidationResult(AgentValidationResult validationResult);
+
+    void AddShortlistItem(AgentShortlistItem shortlistItem);
+
+    void AddApprovalDecision(AgentApprovalDecision approvalDecision);
+
     Task<AgentWorkflowRun?> GetOwnedAsync(
         string userId,
         Guid workflowId,
