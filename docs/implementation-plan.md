@@ -20,7 +20,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 3 - Profiles and recruiter job management
 
-- Status: complete on `feature/part-3-job-management`
+- Status: complete and merged
 - Job-seeker and recruiter/company profiles
 - Job-posting entities, skills, validation, ownership, and status
 - CRUD, search, filtering, sorting, and pagination
@@ -28,11 +28,12 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 4 - React web application
 
-- Status: not started
+- Status: complete on `feature/part-4-react-web`
 - Shared authentication and protected routes
-- Job-seeker profile, jobs, and application screens
-- Recruiter company, job-management, and application-review screens
+- Job-seeker profile and public job discovery screens
+- Recruiter company and job-management screens
 - Loading, empty, validation, success, and error states
+- Reserved application screens that clearly identify the Part 8 dependency
 
 ## Part 5 - Flutter job-seeker application
 

@@ -10,6 +10,23 @@ builder.Services.AddControllers()
 builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WebClient", policy =>
+    {
+        var allowedOrigins = builder.Configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>() ?? [];
+
+        if (allowedOrigins.Length > 0)
+        {
+            policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -18,6 +35,7 @@ if (!app.Environment.IsEnvironment("Testing"))
     app.UseExceptionHandler();
 }
 
+app.UseCors("WebClient");
 app.UseAuthentication();
 app.UseAuthorization();
 
