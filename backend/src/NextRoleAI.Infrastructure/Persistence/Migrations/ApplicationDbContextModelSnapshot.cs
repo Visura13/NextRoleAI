@@ -154,6 +154,281 @@ namespace NextRoleAI.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentApprovalDecision", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("DecidedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DecidedByUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Decision")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("Feedback")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid>("WorkflowRunId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkflowRunId", "DecidedAtUtc");
+
+                    b.ToTable("AgentApprovalDecisions", (string)null);
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentShortlistItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("JobPostingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReasonSummary")
+                        .IsRequired()
+                        .HasMaxLength(1500)
+                        .HasColumnType("character varying(1500)");
+
+                    b.Property<decimal>("Score")
+                        .HasPrecision(5, 1)
+                        .HasColumnType("numeric(5,1)");
+
+                    b.Property<Guid>("WorkflowRunId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobPostingId");
+
+                    b.HasIndex("WorkflowRunId", "JobPostingId")
+                        .IsUnique();
+
+                    b.HasIndex("WorkflowRunId", "Rank")
+                        .IsUnique();
+
+                    b.ToTable("AgentShortlistItems", (string)null);
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentToolCall", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("DurationMilliseconds")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Error")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("InputJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("OutputJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("StartedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Succeeded")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ToolName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("WorkflowStepId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkflowStepId", "StartedAtUtc");
+
+                    b.ToTable("AgentToolCalls", (string)null);
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentValidationResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("Passed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RuleName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<Guid>("WorkflowRunId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkflowRunId", "CreatedAtUtc");
+
+                    b.ToTable("AgentValidationResults", (string)null);
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ApprovalStatus")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CurrentAgent")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FailureCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FailureMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("FinalSummary")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Objective")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("RevisionNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status", "UpdatedAtUtc");
+
+                    b.HasIndex("UserId", "CreatedAtUtc");
+
+                    b.ToTable("AgentWorkflowRuns", (string)null);
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowStep", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AgentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("AllowedTools")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("DurationMilliseconds")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Error")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("InputJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("OutputJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Responsibility")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("StartedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<Guid>("WorkflowRunId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkflowRunId", "Sequence")
+                        .IsUnique();
+
+                    b.ToTable("AgentWorkflowSteps", (string)null);
+                });
+
             modelBuilder.Entity("NextRoleAI.Domain.Cvs.CvDocument", b =>
                 {
                     b.Property<Guid>("Id")
@@ -660,6 +935,78 @@ namespace NextRoleAI.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentApprovalDecision", b =>
+                {
+                    b.HasOne("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowRun", "WorkflowRun")
+                        .WithMany("ApprovalDecisions")
+                        .HasForeignKey("WorkflowRunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkflowRun");
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentShortlistItem", b =>
+                {
+                    b.HasOne("NextRoleAI.Domain.Jobs.JobPosting", "JobPosting")
+                        .WithMany()
+                        .HasForeignKey("JobPostingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowRun", "WorkflowRun")
+                        .WithMany("ShortlistItems")
+                        .HasForeignKey("WorkflowRunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobPosting");
+
+                    b.Navigation("WorkflowRun");
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentToolCall", b =>
+                {
+                    b.HasOne("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowStep", "WorkflowStep")
+                        .WithMany("ToolCalls")
+                        .HasForeignKey("WorkflowStepId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkflowStep");
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentValidationResult", b =>
+                {
+                    b.HasOne("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowRun", "WorkflowRun")
+                        .WithMany("ValidationResults")
+                        .HasForeignKey("WorkflowRunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkflowRun");
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowRun", b =>
+                {
+                    b.HasOne("NextRoleAI.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowStep", b =>
+                {
+                    b.HasOne("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowRun", "WorkflowRun")
+                        .WithMany("Steps")
+                        .HasForeignKey("WorkflowRunId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkflowRun");
+                });
+
             modelBuilder.Entity("NextRoleAI.Domain.Cvs.CvDocument", b =>
                 {
                     b.HasOne("NextRoleAI.Infrastructure.Identity.ApplicationUser", null)
@@ -740,6 +1087,22 @@ namespace NextRoleAI.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowRun", b =>
+                {
+                    b.Navigation("ApprovalDecisions");
+
+                    b.Navigation("ShortlistItems");
+
+                    b.Navigation("Steps");
+
+                    b.Navigation("ValidationResults");
+                });
+
+            modelBuilder.Entity("NextRoleAI.Domain.AgentWorkflows.AgentWorkflowStep", b =>
+                {
+                    b.Navigation("ToolCalls");
                 });
 
             modelBuilder.Entity("NextRoleAI.Domain.Cvs.CvDocument", b =>

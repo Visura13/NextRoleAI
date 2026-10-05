@@ -1,4 +1,6 @@
 import 'package:nextroleai_mobile/core/storage/session_storage.dart';
+import 'package:nextroleai_mobile/features/agent_workflows/data/agent_workflows_repository.dart';
+import 'package:nextroleai_mobile/features/agent_workflows/models/agent_workflow.dart';
 import 'package:nextroleai_mobile/features/auth/data/auth_repository.dart';
 import 'package:nextroleai_mobile/features/auth/models/auth_models.dart';
 import 'package:nextroleai_mobile/features/cv/data/cv_file_picker.dart';
@@ -208,5 +210,71 @@ class FakeRecommendationsDataSource implements RecommendationsDataSource {
   Future<List<JobRecommendation>> getRecommendations() async {
     if (error != null) throw error!;
     return items;
+  }
+}
+
+AgentWorkflow sampleAgentWorkflow({
+  String status = 'PendingApproval',
+  bool approved = false,
+}) => AgentWorkflow(
+  id: 'workflow-1',
+  objective: 'Find the best 3 software engineering jobs for my profile.',
+  status: status,
+  approvalStatus: approved ? 'Approved' : 'Pending',
+  currentAgent: approved ? 'Job Discovery Agent' : 'Human Approval Gate',
+  failureCode: null,
+  failureMessage: null,
+  finalSummary: approved ? 'Published 1 approved recommendation.' : null,
+  createdAtUtc: DateTime.utc(2030),
+  steps: const [],
+  validationResults: const [
+    AgentValidation(
+      ruleName: 'ToolAllowList',
+      passed: true,
+      message: 'Every tool was allowed.',
+    ),
+  ],
+  shortlist: [
+    AgentShortlistItem(
+      jobId: 'job-1',
+      companyName: 'Northstar Labs',
+      title: 'Flutter Engineer',
+      location: 'Colombo',
+      workMode: 'Hybrid',
+      score: 92.5,
+      rank: 1,
+      reasonSummary: 'Skills and title match.',
+      isApproved: approved,
+    ),
+  ],
+);
+
+class FakeAgentWorkflowsDataSource implements AgentWorkflowsDataSource {
+  List<AgentWorkflow> items = [];
+  Object? error;
+  String? lastDecision;
+
+  @override
+  Future<AgentWorkflow> decide({
+    required String workflowId,
+    required String decision,
+    required String feedback,
+    String? revisedObjective,
+  }) async {
+    if (error != null) throw error!;
+    lastDecision = decision;
+    return sampleAgentWorkflow(status: 'Completed', approved: true);
+  }
+
+  @override
+  Future<List<AgentWorkflow>> list() async {
+    if (error != null) throw error!;
+    return items;
+  }
+
+  @override
+  Future<AgentWorkflow> start(String objective) async {
+    if (error != null) throw error!;
+    return sampleAgentWorkflow();
   }
 }

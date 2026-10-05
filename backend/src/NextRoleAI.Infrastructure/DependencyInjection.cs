@@ -5,11 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using NextRoleAI.AgenticAI;
+using NextRoleAI.Application.AgentWorkflows;
 using NextRoleAI.Application.Authentication;
 using NextRoleAI.Application.Cvs;
 using NextRoleAI.Application.Jobs;
 using NextRoleAI.Application.Profiles;
 using NextRoleAI.Application.Recommendations;
+using NextRoleAI.Infrastructure.AgentWorkflows;
 using NextRoleAI.Infrastructure.Authentication;
 using NextRoleAI.Infrastructure.Cvs;
 using NextRoleAI.Infrastructure.Identity;
@@ -113,6 +116,16 @@ public static class DependencyInjection
         services.AddScoped<ICvService, CvService>();
         services.AddSingleton<IJobMatchScorer, DeterministicJobMatchScorer>();
         services.AddScoped<IRecommendationService, RecommendationService>();
+        services.AddScoped<IAgentWorkflowStore, AgentWorkflowStore>();
+        services.AddScoped<IAgentTool, CandidateProfileReadTool>();
+        services.AddScoped<IAgentTool, RankPublishedJobsTool>();
+        services.AddScoped<IAgentTool, PublishShortlistTool>();
+        services.AddSingleton<ObjectiveGuard>();
+        services.AddSingleton<PlanningAgent>();
+        services.AddSingleton<CandidateProfileAgent>();
+        services.AddSingleton<JobDiscoveryAgent>();
+        services.AddSingleton<ValidationSafetyAgent>();
+        services.AddScoped<IAgentWorkflowService, AgentWorkflowOrchestrator>();
 
         return services;
     }

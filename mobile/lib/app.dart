@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'core/theme/app_theme.dart';
+import 'features/agent_workflows/data/agent_workflows_repository.dart';
+import 'features/agent_workflows/state/agent_workflows_view_model.dart';
 import 'features/auth/state/auth_view_model.dart';
 import 'features/cv/data/cv_file_picker.dart';
 import 'features/cv/data/cv_repository.dart';
@@ -23,6 +25,7 @@ class NextRoleApp extends StatelessWidget {
     required this.cvFilePicker,
     required this.cvRepository,
     required this.recommendationsRepository,
+    required this.agentWorkflowsRepository,
     super.key,
   });
 
@@ -33,6 +36,7 @@ class NextRoleApp extends StatelessWidget {
   final CvFilePicker cvFilePicker;
   final CvDataSource cvRepository;
   final RecommendationsDataSource recommendationsRepository;
+  final AgentWorkflowsDataSource agentWorkflowsRepository;
 
   @override
   Widget build(BuildContext context) => MultiProvider(
@@ -47,6 +51,9 @@ class NextRoleApp extends StatelessWidget {
       ),
       ChangeNotifierProvider(
         create: (_) => RecommendationsViewModel(recommendationsRepository),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => AgentWorkflowsViewModel(agentWorkflowsRepository),
       ),
     ],
     child: MaterialApp.router(

@@ -111,6 +111,12 @@ class HomeScreen extends StatelessWidget {
               onTap: () => context.push('/recommendations'),
             ),
             _ActionCard(
+              icon: Icons.account_tree_outlined,
+              title: 'Controlled AI workflow',
+              subtitle: 'Delegate a shortlist, inspect every step, then approve or reject it.',
+              onTap: () => context.push('/agent-workflows'),
+            ),
+            _ActionCard(
               icon: Icons.track_changes_outlined,
               title: 'Application status',
               subtitle: 'Reserved for the cross-platform workflow in Part 8.',

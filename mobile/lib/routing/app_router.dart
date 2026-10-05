@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../features/auth/presentation/login_screen.dart';
+import '../features/agent_workflows/presentation/agent_workflows_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/splash_screen.dart';
 import '../features/auth/state/auth_view_model.dart';
@@ -70,6 +71,10 @@ GoRouter createAppRouter({
     GoRoute(
       path: '/recommendations',
       builder: (context, state) => const RecommendationsScreen(),
+    ),
+    GoRoute(
+      path: '/agent-workflows',
+      builder: (context, state) => const AgentWorkflowsScreen(),
     ),
     GoRoute(
       path: '/applications',

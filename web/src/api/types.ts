@@ -145,3 +145,86 @@ export interface JobRecommendation {
 export interface RecommendationResponse {
   items: JobRecommendation[];
 }
+
+export type AgentWorkflowStatus = 'Running' | 'PendingApproval' | 'Completed' | 'Rejected' | 'RevisionRequested' | 'Failed';
+export type AgentApprovalStatus = 'NotRequested' | 'Pending' | 'Approved' | 'Rejected' | 'RevisionRequested';
+export type AgentStepStatus = 'Pending' | 'Running' | 'Completed' | 'Failed' | 'AwaitingApproval';
+export type AgentDecisionType = 'Approve' | 'Reject' | 'RequestRevision';
+
+export interface AgentToolCall {
+  id: string;
+  toolName: string;
+  succeeded: boolean;
+  error: string | null;
+  startedAtUtc: string;
+  completedAtUtc: string;
+  durationMilliseconds: number;
+}
+
+export interface AgentWorkflowStep {
+  id: string;
+  sequence: number;
+  agentName: string;
+  responsibility: string;
+  allowedTools: string[];
+  status: AgentStepStatus;
+  retryCount: number;
+  error: string | null;
+  startedAtUtc: string | null;
+  completedAtUtc: string | null;
+  durationMilliseconds: number | null;
+  toolCalls: AgentToolCall[];
+}
+
+export interface AgentValidationResult {
+  ruleName: string;
+  passed: boolean;
+  message: string;
+  createdAtUtc: string;
+}
+
+export interface AgentShortlistItem {
+  jobId: string;
+  companyName: string;
+  title: string;
+  location: string;
+  employmentType: EmploymentType;
+  workMode: WorkMode;
+  score: number;
+  rank: number;
+  reasonSummary: string;
+  isApproved: boolean;
+}
+
+export interface AgentApprovalDecision {
+  decision: AgentDecisionType;
+  feedback: string;
+  decidedAtUtc: string;
+}
+
+export interface AgentWorkflow {
+  id: string;
+  objective: string;
+  status: AgentWorkflowStatus;
+  approvalStatus: AgentApprovalStatus;
+  currentAgent: string;
+  revisionNumber: number;
+  failureCode: string | null;
+  failureMessage: string | null;
+  finalSummary: string | null;
+  createdAtUtc: string;
+  updatedAtUtc: string;
+  completedAtUtc: string | null;
+  steps: AgentWorkflowStep[];
+  validationResults: AgentValidationResult[];
+  shortlist: AgentShortlistItem[];
+  approvalDecisions: AgentApprovalDecision[];
+}
+
+export interface AgentWorkflowList {
+  items: AgentWorkflow[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
