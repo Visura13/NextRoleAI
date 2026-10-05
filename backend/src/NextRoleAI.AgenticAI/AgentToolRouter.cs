@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using NextRoleAI.Application.AgentWorkflows;
 using NextRoleAI.Domain.AgentWorkflows;
 
@@ -7,7 +8,7 @@ namespace NextRoleAI.AgenticAI;
 
 public sealed class AgentToolRouter
 {
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions JsonOptions = CreateJsonOptions();
 
     private readonly IReadOnlyDictionary<string, IAgentTool> tools;
     private readonly IAgentWorkflowStore store;
@@ -102,5 +103,12 @@ public sealed class AgentToolRouter
                 false,
                 error);
         }
+    }
+
+    private static JsonSerializerOptions CreateJsonOptions()
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        options.Converters.Add(new JsonStringEnumConverter());
+        return options;
     }
 }
