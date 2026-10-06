@@ -4,7 +4,7 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 7 adds a controlled four-agent job-shortlisting workflow across the React and Flutter Job Seeker clients. It uses allow-listed tools, structured state, deterministic validation, prompt-injection defenses, retries, timeouts, a durable audit trail, and an explicit human approval gate. Application submission and recruiter decisions remain deferred to Part 8.
+Part 8 adds the complete cross-platform application lifecycle. Job Seekers submit and track applications in React or Flutter, Recruiters review and decide them in React, every transition is auditable, and Resend email attempts are persisted without making provider availability a prerequisite for business updates.
 
 ## Planned architecture
 
@@ -51,6 +51,8 @@ Configure the API process in the current PowerShell session:
 $env:ConnectionStrings__DefaultConnection = "Host=localhost;Port=5432;Database=nextroleai;Username=nextroleai;Password=YOUR_LOCAL_PASSWORD"
 $env:Jwt__SigningKey = "YOUR_RANDOM_SIGNING_KEY_WITH_AT_LEAST_32_CHARACTERS"
 ```
+
+Email delivery is disabled by default. For a live Resend demonstration, also configure `Notifications__Enabled`, `Notifications__ResendApiKey`, and `Notifications__FromAddress` as described in [the Part 8 API guide](docs/api/part-8-applications-notifications.md).
 
 CV files default to the operating system's private application-data directory, outside this repository. To use another private development directory, optionally set `CvStorage__RootPath` to an absolute path. Do not point it at `web/`, `wwwroot/`, or another publicly served directory.
 
@@ -100,8 +102,15 @@ The API exposes:
 - `GET /api/agent-workflows`: list the current Job Seeker's durable workflow history.
 - `GET /api/agent-workflows/{id}`: inspect one owner-scoped workflow and its audit trail.
 - `POST /api/agent-workflows/{id}/decision`: approve, reject, or request a full revision.
+- `GET|POST /api/applications`: list or submit the current Job Seeker's applications.
+- `GET /api/applications/{id}`: inspect an owner-scoped application and audit history.
+- `POST /api/applications/{id}/respond`: answer a Recruiter's information request.
+- `POST /api/applications/{id}/withdraw`: withdraw an active application.
+- `GET /api/recruiter/applications`: list applications for the Recruiter's company.
+- `GET /api/recruiter/applications/{id}`: inspect one company-owned application.
+- `PATCH /api/recruiter/applications/{id}/status`: record a controlled recruiter decision.
 
-See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for job contracts, [docs/api/part-6-cv-ranking.md](docs/api/part-6-cv-ranking.md) for CV and ranking behavior, and [docs/api/part-7-agentic-workflow.md](docs/api/part-7-agentic-workflow.md) for the controlled workflow.
+See [docs/api/part-3-profiles-and-jobs.md](docs/api/part-3-profiles-and-jobs.md) for job contracts, [docs/api/part-6-cv-ranking.md](docs/api/part-6-cv-ranking.md) for CV and ranking behavior, [docs/api/part-7-agentic-workflow.md](docs/api/part-7-agentic-workflow.md) for the controlled workflow, and [docs/api/part-8-applications-notifications.md](docs/api/part-8-applications-notifications.md) for applications and notification delivery.
 
 ## Run the React web app
 
@@ -113,7 +122,7 @@ npm run dev
 
 Open `http://localhost:5173`. The development API allows this origin by default. Set `VITE_API_BASE_URL` in `web/.env.local` if the API uses another address.
 
-The web client supports both roles. Job Seekers can upload and confirm a CV, inspect explainable recommendations, and start or review controlled AI workflows. Application pages remain reserved until Part 8. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
+The web client supports both roles. Job Seekers can upload and confirm a CV, inspect explainable recommendations, run controlled AI workflows, submit applications, and track decisions. Recruiters manage their jobs and application pipeline. See [docs/api/part-4-react-web.md](docs/api/part-4-react-web.md) for client architecture and the session-storage decision.
 
 ## Run the Flutter mobile app
 
@@ -125,7 +134,7 @@ flutter pub get
 flutter run
 ```
 
-Android emulators use `http://10.0.2.2:5251` by default. For a physical device or another API address, pass `--dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251`. The mobile app supports CV upload/review, explainable recommendations, and the same controlled workflow and approval actions as the web app. See [docs/api/part-5-flutter-mobile.md](docs/api/part-5-flutter-mobile.md) for its architecture.
+Android emulators use `http://10.0.2.2:5251` by default. For a physical device or another API address, pass `--dart-define=NEXTROLEAI_API_BASE_URL=http://YOUR_HOST:5251`. The mobile app supports CV upload/review, explainable recommendations, controlled workflow approval, application submission, and status tracking. See [docs/api/part-5-flutter-mobile.md](docs/api/part-5-flutter-mobile.md) for its architecture.
 
 ## Run the tests
 
@@ -155,6 +164,8 @@ PostgreSQL integration tests run automatically in GitHub Actions. To run them lo
 - Agent tools are fixed by server-side allow-lists and use structured input/output contracts.
 - Shortlist publication is impossible until the owner explicitly approves a validated proposal.
 - Workflow logs contain structured audit evidence, not hidden model reasoning or secrets.
+- Application transitions are role- and ownership-checked and appended to immutable status history.
+- Notification secrets remain server-side, and failed delivery never reverses a recorded application decision.
 
 ## Roles in the current scope
 

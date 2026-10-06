@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/widgets/states.dart';
@@ -95,7 +96,15 @@ class JobDetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
                 const FeedbackBanner(
-                  message: 'Applications open in Part 8 after approval, audit history, and notification rules are implemented.',
+                  message: 'Submitting is explicit and every recruiter update is stored in your audit timeline.',
+                ),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: () => context.push(
+                    '/applications?jobId=${Uri.encodeQueryComponent(job.id)}',
+                  ),
+                  icon: const Icon(Icons.send_outlined),
+                  label: const Text('Apply for this role'),
                 ),
               ],
             ),

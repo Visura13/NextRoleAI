@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../features/auth/presentation/login_screen.dart';
 import '../features/agent_workflows/presentation/agent_workflows_screen.dart';
+import '../features/applications/presentation/applications_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/splash_screen.dart';
 import '../features/auth/state/auth_view_model.dart';
 import '../features/cv/presentation/cv_workspace_screen.dart';
 import '../features/home/presentation/home_screen.dart';
-import '../features/home/presentation/reserved_screen.dart';
 import '../features/jobs/data/jobs_repository.dart';
 import '../features/jobs/presentation/job_details_screen.dart';
 import '../features/jobs/presentation/jobs_screen.dart';
@@ -78,10 +77,9 @@ GoRouter createAppRouter({
     ),
     GoRoute(
       path: '/applications',
-      builder: (context, state) => const ReservedScreen(
-        title: 'Applications',
-        message: 'Part 8 will add application submission, recruiter decisions, audit history, and status tracking.',
-        icon: Icons.track_changes_outlined,
+      builder: (context, state) => ApplicationsScreen(
+        initialJobId: state.uri.queryParameters['jobId'],
+        sourceWorkflowRunId: state.uri.queryParameters['workflowId'],
       ),
     ),
   ],

@@ -27,8 +27,8 @@ export function JobDetailsPage() {
       <aside className="detail-card">
         <p className="eyebrow">Role details</p>
         <dl><div><dt>Salary</dt><dd>{formatSalary(job)}</dd></div><div><dt>Experience</dt><dd>{job.minimumYearsExperience}+ years</dd></div><div><dt>Closes</dt><dd>{job.closesAtUtc ? new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(job.closesAtUtc)) : 'Open until filled'}</dd></div></dl>
-        {session?.user.role === 'JobSeeker' ? <Notice kind="info">Applications will open in Part 8. You can complete your profile now so you are ready.</Notice> : <Notice kind="info">Log in as a Job Seeker to use the application workflow when it launches.</Notice>}
-        <Link className="button button--full" to={session?.user.role === 'JobSeeker' ? '/job-seeker/profile' : '/register'}>{session?.user.role === 'JobSeeker' ? 'Review my profile' : 'Create job seeker account'}</Link>
+        {session?.user.role === 'JobSeeker' ? <Notice kind="info">Submitting is always an explicit action. You can track every recruiter update on web or mobile.</Notice> : <Notice kind="info">Log in as a Job Seeker to submit and track an application.</Notice>}
+        <Link className="button button--full" to={session?.user.role === 'JobSeeker' ? `/job-seeker/applications?jobId=${job.id}` : '/register'}>{session?.user.role === 'JobSeeker' ? 'Apply for this role' : 'Create job seeker account'}</Link>
       </aside>
     </div>
   );

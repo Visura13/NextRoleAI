@@ -228,3 +228,51 @@ export interface AgentWorkflowList {
   totalCount: number;
   totalPages: number;
 }
+
+export type ApplicationStatus = 'Submitted' | 'InReview' | 'MoreInformationRequested' | 'Shortlisted' | 'Rejected' | 'Withdrawn';
+export type ApplicationActorRole = 'JobSeeker' | 'Recruiter';
+export type NotificationDeliveryStatus = 'Pending' | 'Sent' | 'Skipped' | 'Failed';
+
+export interface ApplicationStatusEvent {
+  id: string;
+  previousStatus: ApplicationStatus | null;
+  newStatus: ApplicationStatus;
+  actorRole: ApplicationActorRole;
+  note: string;
+  createdAtUtc: string;
+}
+
+export interface NotificationDelivery {
+  eventType: string;
+  provider: string;
+  status: NotificationDeliveryStatus;
+  attemptCount: number;
+  createdAtUtc: string;
+  attemptedAtUtc: string | null;
+}
+
+export interface JobApplication {
+  id: string;
+  jobPostingId: string;
+  jobTitle: string;
+  companyName: string;
+  jobLocation: string;
+  jobSeekerUserId: string;
+  jobSeekerName: string;
+  jobSeekerEmail: string;
+  coverNote: string;
+  status: ApplicationStatus;
+  sourceWorkflowRunId: string | null;
+  statusHistory: ApplicationStatusEvent[];
+  notificationDeliveries: NotificationDelivery[];
+  createdAtUtc: string;
+  updatedAtUtc: string;
+}
+
+export interface ApplicationList {
+  items: JobApplication[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}

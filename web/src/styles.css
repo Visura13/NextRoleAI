@@ -217,6 +217,28 @@ label small { color: var(--muted); font-weight: 400; }
 .agent-timeline p { margin: 6px 0; }
 .tool-call { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; border-radius: 8px; background: var(--cream); padding: 8px 10px; }
 .approval-panel { margin-top: 16px; border: 1px solid var(--orange); border-radius: 16px; background: #fff8ef; padding: 16px; }
+.application-form h2 { margin-bottom: 4px; }
+.application-list { display: grid; gap: 18px; }
+.application-card { display: grid; gap: 18px; background: white; border: 1px solid var(--line); border-radius: 18px 18px 18px 5px; padding: 22px; box-shadow: var(--shadow); }
+.application-card__header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.application-card__header h2 { margin: 0 0 5px; }
+.application-card__header p { margin-bottom: 0; color: var(--muted); }
+.application-card blockquote { margin: 0; border-left: 3px solid var(--lime); padding: 8px 0 8px 16px; color: #45534d; white-space: pre-line; }
+.application-card details { border-top: 1px solid var(--line); padding-top: 14px; }
+.application-card summary { color: var(--forest); cursor: pointer; font-weight: 800; }
+.application-status { display: inline-flex; border-radius: 99px; padding: 7px 10px; font-size: .72rem; font-weight: 800; white-space: nowrap; }
+.application-status--submitted { color: #305365; background: #e7f1f5; }
+.application-status--inreview { color: #81540e; background: #fff0ce; }
+.application-status--moreinformationrequested { color: #71430c; background: #fff3df; }
+.application-status--shortlisted { color: #245d3d; background: #e2f3e9; }
+.application-status--rejected,.application-status--withdrawn { color: #6d4040; background: #f3e8e8; }
+.application-timeline { display: grid; gap: 0; margin: 16px 0 0; padding: 0; list-style: none; }
+.application-timeline li { border-left: 3px solid var(--forest); padding: 2px 0 15px 16px; }
+.application-timeline span { display: block; color: var(--muted); font-size: .8rem; }
+.application-timeline p { margin: 5px 0 0; }
+.application-action { display: grid; gap: 14px; border-radius: 12px; background: var(--cream); padding: 16px; }
+.notification-audit { color: var(--muted); font-size: .85rem; }
+.compact-filter { min-width: 210px; }
 @media (max-width:1000px) { .hero__grid { grid-template-columns: 1fr .7fr; gap: 40px; } .filter-panel { grid-template-columns: repeat(3,1fr); } .job-grid { grid-template-columns: repeat(2,1fr); } .portal-layout { grid-template-columns: 190px minmax(0,1fr); gap: 28px; } .metric-grid { grid-template-columns: 1fr; } .upload-panel { grid-template-columns: 1fr; } }
 @media (max-width:760px) { .container { width: min(100% - 26px,1180px); } .menu-button { display: block; border: 1px solid var(--line); background: white; border-radius: 8px; padding: 8px 11px; } .main-nav { display: none; position: absolute; left: 13px; right: 13px; top: 68px; padding: 18px; background: white; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); align-items: stretch; flex-direction: column; gap: 14px; } .main-nav.is-open { display: flex; } .user-chip { border: 0; padding: 0; } .hero { padding: 65px 0; } .hero__grid,.detail-layout,.portal-layout,.auth-page,.recommendation,.recommendation__evidence,.workflow-layout { grid-template-columns: 1fr; } .hero-card { display: none; } .trust-row { flex-direction: column; gap: 15px; } .feature-grid,.job-grid,.job-grid--portal,.form-grid,.form-grid--three,.role-picker,.filter-panel { grid-template-columns: 1fr; } .auth-panel--intro { min-height: 420px; gap: 50px; } .auth-panel { padding: 38px 25px; } .portal-sidebar { position: static; border-bottom: 1px solid var(--line); padding-bottom: 18px; } .portal-sidebar nav { display: flex; overflow-x: auto; } .portal-sidebar nav a { white-space: nowrap; } .detail-card { position: static; } .portal-header--action,.action-panel,.footer-inner { align-items: flex-start; flex-direction: column; } .score-breakdown { padding-top: 10px; } .recommendation__score { position: static; } .agent-shortlist article { grid-template-columns: auto 1fr; } .agent-shortlist article>.status { grid-column: 2; justify-self: start; } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior: auto!important; animation-duration: .01ms!important; transition-duration: .01ms!important; } }

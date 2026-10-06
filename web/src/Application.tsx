@@ -9,13 +9,14 @@ import { JobSeekerProfilePage } from './pages/job-seeker/JobSeekerProfilePage';
 import { CvPage } from './pages/job-seeker/CvPage';
 import { RecommendationsPage } from './pages/job-seeker/RecommendationsPage';
 import { AgentWorkflowsPage } from './pages/job-seeker/AgentWorkflowsPage';
+import { ApplicationsPage } from './pages/job-seeker/ApplicationsPage';
 import { JobDetailsPage } from './pages/jobs/JobDetailsPage';
 import { JobsPage } from './pages/jobs/JobsPage';
 import { CompanyProfilePage } from './pages/recruiter/CompanyProfilePage';
 import { JobEditorPage } from './pages/recruiter/JobEditorPage';
 import { RecruiterDashboardPage } from './pages/recruiter/RecruiterDashboardPage';
 import { RecruiterJobsPage } from './pages/recruiter/RecruiterJobsPage';
-import { ComingSoonPage } from './pages/shared/ComingSoonPage';
+import { RecruiterApplicationsPage } from './pages/recruiter/ApplicationsPage';
 import { DashboardRedirect } from './pages/shared/DashboardRedirect';
 import { HomePage } from './pages/shared/HomePage';
 import { NotFoundPage } from './pages/shared/NotFoundPage';
@@ -41,7 +42,7 @@ export function Application() {
             <Route path="cv" element={<CvPage />} />
             <Route path="recommendations" element={<RecommendationsPage />} />
             <Route path="agent-workflows" element={<AgentWorkflowsPage />} />
-            <Route path="applications" element={<ComingSoonPage />} />
+            <Route path="applications" element={<ApplicationsPage />} />
           </Route>
         </Route>
 
@@ -52,7 +53,7 @@ export function Application() {
             <Route path="jobs" element={<RecruiterJobsPage />} />
             <Route path="jobs/new" element={<JobEditorPage />} />
             <Route path="jobs/:jobId/edit" element={<JobEditorPage />} />
-            <Route path="applications" element={<ComingSoonPage />} />
+            <Route path="applications" element={<RecruiterApplicationsPage />} />
           </Route>
         </Route>
 

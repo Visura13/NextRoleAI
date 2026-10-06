@@ -55,7 +55,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 7 - Controlled Agentic AI workflow
 
-- Status: complete on `feature/part-7-agentic-workflow`
+- Status: complete and merged
 - Planning, CV Profile, Job Discovery, and Validation agents
 - Allow-listed tools and structured input/output contracts
 - Durable workflow state, retries, timeouts, logs, and safe failures
@@ -64,7 +64,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 8 - Cross-platform approval and notifications
 
-- Status: not started
+- Status: complete on `feature/part-8-applications-notifications`
 - Application workflow from Flutter or React
 - Recruiter decision through React
 - Updated Job Seeker status in both clients
