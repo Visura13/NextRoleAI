@@ -83,4 +83,59 @@ public sealed class AgentEvaluationTests
         Assert.All(golden, rule => Assert.True(rule.Passed));
         Assert.False(unsafeTools.Single(rule => rule.RuleName == "ToolAllowList").Passed);
     }
+
+    [Fact]
+    public void ValidationAgent_RejectsUnconfirmedDuplicateAndOutOfRangeProposal()
+    {
+        var planner = new PlanningAgent(new ObjectiveGuard());
+        var plan = planner.Execute(
+            "Find the best 2 software engineering roles for my profile.");
+        var duplicatedJobId = Guid.NewGuid();
+        var profile = new CandidateProfileToolOutput(
+            false,
+            "Software Engineer",
+            "Software Engineer",
+            "Colombo",
+            3,
+            ["C#"]);
+        var shortlist = new[]
+        {
+            CreateRankedJob(duplicatedJobId, 101m),
+            CreateRankedJob(duplicatedJobId, 39m)
+        };
+        var agent = new ValidationSafetyAgent(new ObjectiveGuard());
+
+        var results = agent.Execute(
+            plan.ObjectiveSummary,
+            plan,
+            profile,
+            shortlist,
+            [AgentToolNames.ReadCandidateProfile, AgentToolNames.RankPublishedJobs]);
+
+        Assert.False(results.Single(rule => rule.RuleName == "ConfirmedProfile").Passed);
+        Assert.False(results.Single(rule => rule.RuleName == "UniquePublishedJobs").Passed);
+        Assert.False(results.Single(rule => rule.RuleName == "ScoreRange").Passed);
+    }
+
+    [Theory]
+    [InlineData("Find jobs.")]
+    [InlineData("Find the best roles for me.\u0001")]
+    public void ObjectiveGuard_RejectsInvalidShape(string objective)
+    {
+        var guard = new ObjectiveGuard();
+
+        Assert.ThrowsAny<Exception>(() => guard.ValidateAndNormalise(objective));
+    }
+
+    private static RankedJobToolItem CreateRankedJob(Guid jobId, decimal score) =>
+        new(
+            jobId,
+            "Recommendation Labs",
+            "Software Engineer",
+            "Colombo",
+            EmploymentType.FullTime,
+            WorkMode.Hybrid,
+            score,
+            ["Deterministic match evidence."],
+            []);
 }

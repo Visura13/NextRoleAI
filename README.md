@@ -4,9 +4,9 @@ NextRoleAI is an AI-assisted recruitment platform that helps job seekers turn a 
 
 ## Current increment
 
-Part 8 adds the complete cross-platform application lifecycle. Job Seekers submit and track applications in React or Flutter, Recruiters review and decide them in React, every transition is auditable, and Resend email attempts are persisted without making provider availability a prerequisite for business updates.
+Part 9 makes the system assessment- and deployment-ready: live OpenAPI/Swagger with JWT support, response hardening, expanded security and agent evaluation tests, a multi-stage API container, a Render Blueprint for API/PostgreSQL/React, a downloadable CI-built Android APK, a load harness, architecture/ER/agent diagrams, and a structured evidence pack. Live URLs, measured deployed performance, account details, the video, and the student's own reflection must be added after deployment.
 
-## Planned architecture
+## Architecture
 
 ```text
 React web app -----------\
@@ -17,6 +17,8 @@ Flutter mobile app -----/           |
 ```
 
 React and Flutter will use the same API, identity, roles, permissions, and business rules. Neither client will connect directly to PostgreSQL, an AI model, or a third-party provider.
+
+See the [system architecture](docs/architecture/system-architecture.md), [ER diagram](docs/architecture/er-diagram.md), and [agent sequence](docs/architecture/agent-workflow.md).
 
 ## Solution projects
 
@@ -81,6 +83,7 @@ dotnet run --project backend/src/NextRoleAI.Api
 The API exposes:
 
 - `GET /health`: infrastructure-friendly health endpoint.
+- `GET /swagger`: interactive OpenAPI documentation with JWT bearer support.
 - `GET /api/health`: JSON service health response.
 - `POST /api/auth/register/job-seeker`: create a Job Seeker account.
 - `POST /api/auth/register/recruiter`: create a Recruiter account.
@@ -151,6 +154,28 @@ flutter test
 ```
 
 PostgreSQL integration tests run automatically in GitHub Actions. To run them locally, set `NEXTROLEAI_TEST_CONNECTION_STRING` to a disposable PostgreSQL database before running the test command.
+
+The test inventory, end-to-end trace, security evidence, agent evaluation, and performance procedure are documented in [docs/testing](docs/testing/test-strategy-and-results.md). Run the dependency-free HTTP load harness with:
+
+```powershell
+$env:NEXTROLEAI_BASE_URL = "https://YOUR-API-HOST"
+node scripts/performance/http-load-test.mjs
+```
+
+## Deploy and package
+
+`render.yaml` provisions the Dockerized API, private PostgreSQL 17 database, and React static site. Follow [the deployment guide](docs/deployment/deployment-guide.md), then complete [the evaluator-access checklist](docs/deployment/evaluator-access.md). The free blueprint keeps CVs private but uses ephemeral storage; the limitation and production upgrade are documented in ADR 0008.
+
+Successful Flutter CI runs upload an installable debug APK as the `NextRoleAI-android-debug` workflow artifact. It is intended for assignment testing, not store distribution.
+
+## Assessment evidence
+
+- [Consolidated report draft](docs/report/consolidated-report-draft.md)
+- [Student-only reflection prompts](docs/report/personal-reflection-prompts.md)
+- [AI usage log](docs/ai/ai-usage-log.md)
+- [Git and CI evidence](docs/evidence/git-and-ci-evidence.md)
+- [Ten-minute demo script](docs/demo/10-minute-demo-script.md)
+- [Viva preparation](docs/viva/viva-preparation.md)
 
 ## Authentication security
 

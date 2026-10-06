@@ -64,7 +64,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 8 - Cross-platform approval and notifications
 
-- Status: complete on `feature/part-8-applications-notifications`
+- Status: complete and merged
 - Application workflow from Flutter or React
 - Recruiter decision through React
 - Updated Job Seeker status in both clients
@@ -72,7 +72,7 @@ Each part should finish with working code, automated verification, a focused com
 
 ## Part 9 - Quality, deployment, and assessment evidence
 
-- Status: not started
+- Status: implementation complete on `feature/part-9-quality-deployment-evidence`; live deployment evidence remains student-owned
 - End-to-end, performance, security, and agent-evaluation tests
 - Deployment and APK generation
 - Architecture diagrams, ER diagram, ADRs, reports, and README completion
