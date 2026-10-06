@@ -26,6 +26,9 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
         SetEnvironmentVariable("Jwt__AccessTokenMinutes", "15");
         SetEnvironmentVariable("Jwt__RefreshTokenDays", "7");
         SetEnvironmentVariable("CvStorage__RootPath", cvStoragePath);
+        SetEnvironmentVariable("Notifications__Enabled", "false");
+        SetEnvironmentVariable("Notifications__ResendApiKey", null);
+        SetEnvironmentVariable("Notifications__FromAddress", null);
     }
 
     protected override void Dispose(bool disposing)

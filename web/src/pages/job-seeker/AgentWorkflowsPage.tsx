@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router';
 import useSWR from 'swr';
 import { api, ApiError, swrFetcher } from '../../api/client';
 import type { AgentDecisionType, AgentWorkflow, AgentWorkflowList } from '../../api/types';
@@ -91,7 +92,7 @@ function WorkflowDetails({ workflow, busy, feedback, revisedObjective, onFeedbac
     <div className="cv-file-summary"><div><p className="eyebrow">Run {workflow.id.slice(0, 8)}</p><h2>{workflow.status}</h2><p>{workflow.finalSummary ?? workflow.objective}</p></div><span className={`status status--${workflow.status === 'Completed' ? 'published' : workflow.status === 'Failed' || workflow.status === 'Rejected' ? 'closed' : 'draft'}`}>{workflow.approvalStatus}</span></div>
     {workflow.failureMessage && <Notice kind="error">{workflow.failureCode}: {workflow.failureMessage}</Notice>}
     <h3>Proposed shortlist</h3>
-    {!workflow.shortlist.length ? <p className="muted">No jobs were published by this run.</p> : <div className="agent-shortlist">{workflow.shortlist.map((item) => <article key={item.jobId}><span className="recommendation__score"><strong>{item.score}</strong><small>score</small></span><div><h4>#{item.rank} {item.title}</h4><p>{item.companyName} · {item.location} · {item.workMode}</p><small>{item.reasonSummary}</small></div><span className={`status status--${item.isApproved ? 'published' : 'draft'}`}>{item.isApproved ? 'Published' : 'Proposed'}</span></article>)}</div>}
+    {!workflow.shortlist.length ? <p className="muted">No jobs were published by this run.</p> : <div className="agent-shortlist">{workflow.shortlist.map((item) => <article key={item.jobId}><span className="recommendation__score"><strong>{item.score}</strong><small>score</small></span><div><h4>#{item.rank} {item.title}</h4><p>{item.companyName} · {item.location} · {item.workMode}</p><small>{item.reasonSummary}</small>{item.isApproved && <p><Link className="text-link" to={`/job-seeker/applications?jobId=${item.jobId}&workflowId=${workflow.id}`}>Apply with this approved shortlist →</Link></p>}</div><span className={`status status--${item.isApproved ? 'published' : 'draft'}`}>{item.isApproved ? 'Published' : 'Proposed'}</span></article>)}</div>}
     <h3>Deterministic validation</h3>
     <div className="validation-grid">{workflow.validationResults.map((result) => <div className={result.passed ? 'validation-card is-passed' : 'validation-card is-failed'} key={`${result.ruleName}-${result.createdAtUtc}`}><strong>{result.passed ? 'PASS' : 'FAIL'} · {result.ruleName}</strong><p>{result.message}</p></div>)}</div>
     <h3>Execution history</h3>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NextRoleAI.Domain.AgentWorkflows;
+using NextRoleAI.Domain.Applications;
 using NextRoleAI.Domain.Cvs;
 using NextRoleAI.Domain.Jobs;
 using NextRoleAI.Domain.Profiles;
@@ -38,6 +39,12 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<AgentShortlistItem> AgentShortlistItems => Set<AgentShortlistItem>();
 
     public DbSet<AgentApprovalDecision> AgentApprovalDecisions => Set<AgentApprovalDecision>();
+
+    public DbSet<JobApplication> JobApplications => Set<JobApplication>();
+
+    public DbSet<ApplicationStatusEvent> ApplicationStatusEvents => Set<ApplicationStatusEvent>();
+
+    public DbSet<NotificationDelivery> NotificationDeliveries => Set<NotificationDelivery>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -279,6 +286,78 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.HasOne(decision => decision.WorkflowRun)
                 .WithMany(workflow => workflow.ApprovalDecisions)
                 .HasForeignKey(decision => decision.WorkflowRunId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<JobApplication>(entity =>
+        {
+            entity.ToTable("JobApplications");
+            entity.HasKey(application => application.Id);
+            entity.Property(application => application.JobSeekerUserId).IsRequired();
+            entity.Property(application => application.CoverNote).HasMaxLength(2000).IsRequired();
+            entity.Property(application => application.Status).HasConversion<string>().HasMaxLength(40);
+            entity.HasIndex(application => new
+                { application.JobSeekerUserId, application.JobPostingId })
+                .IsUnique();
+            entity.HasIndex(application => new
+                { application.JobPostingId, application.Status, application.UpdatedAtUtc });
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(application => application.JobSeekerUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(application => application.JobPosting)
+                .WithMany()
+                .HasForeignKey(application => application.JobPostingId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(application => application.SourceWorkflowRun)
+                .WithMany()
+                .HasForeignKey(application => application.SourceWorkflowRunId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        builder.Entity<ApplicationStatusEvent>(entity =>
+        {
+            entity.ToTable("ApplicationStatusEvents");
+            entity.HasKey(statusEvent => statusEvent.Id);
+            entity.Property(statusEvent => statusEvent.PreviousStatus)
+                .HasConversion<string>()
+                .HasMaxLength(40);
+            entity.Property(statusEvent => statusEvent.NewStatus)
+                .HasConversion<string>()
+                .HasMaxLength(40);
+            entity.Property(statusEvent => statusEvent.ActorUserId).IsRequired();
+            entity.Property(statusEvent => statusEvent.ActorRole)
+                .HasConversion<string>()
+                .HasMaxLength(30);
+            entity.Property(statusEvent => statusEvent.Note).HasMaxLength(1000).IsRequired();
+            entity.HasIndex(statusEvent => new
+                { statusEvent.JobApplicationId, statusEvent.CreatedAtUtc });
+            entity.HasOne(statusEvent => statusEvent.JobApplication)
+                .WithMany(application => application.StatusEvents)
+                .HasForeignKey(statusEvent => statusEvent.JobApplicationId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<NotificationDelivery>(entity =>
+        {
+            entity.ToTable("NotificationDeliveries");
+            entity.HasKey(delivery => delivery.Id);
+            entity.Property(delivery => delivery.RecipientUserId).IsRequired();
+            entity.Property(delivery => delivery.RecipientEmail).HasMaxLength(254).IsRequired();
+            entity.Property(delivery => delivery.EventType).HasMaxLength(80).IsRequired();
+            entity.Property(delivery => delivery.Provider).HasMaxLength(50).IsRequired();
+            entity.Property(delivery => delivery.Status).HasConversion<string>().HasMaxLength(30);
+            entity.Property(delivery => delivery.ProviderMessageId).HasMaxLength(200);
+            entity.Property(delivery => delivery.FailureReason).HasMaxLength(500);
+            entity.HasIndex(delivery => new
+                { delivery.JobApplicationId, delivery.CreatedAtUtc });
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(delivery => delivery.RecipientUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(delivery => delivery.JobApplication)
+                .WithMany(application => application.NotificationDeliveries)
+                .HasForeignKey(delivery => delivery.JobApplicationId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

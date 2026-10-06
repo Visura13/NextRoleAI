@@ -1,6 +1,8 @@
 import 'package:nextroleai_mobile/core/storage/session_storage.dart';
 import 'package:nextroleai_mobile/features/agent_workflows/data/agent_workflows_repository.dart';
 import 'package:nextroleai_mobile/features/agent_workflows/models/agent_workflow.dart';
+import 'package:nextroleai_mobile/features/applications/data/applications_repository.dart';
+import 'package:nextroleai_mobile/features/applications/models/job_application.dart';
 import 'package:nextroleai_mobile/features/auth/data/auth_repository.dart';
 import 'package:nextroleai_mobile/features/auth/models/auth_models.dart';
 import 'package:nextroleai_mobile/features/cv/data/cv_file_picker.dart';
@@ -276,5 +278,76 @@ class FakeAgentWorkflowsDataSource implements AgentWorkflowsDataSource {
   Future<AgentWorkflow> start(String objective) async {
     if (error != null) throw error!;
     return sampleAgentWorkflow();
+  }
+}
+
+JobApplication sampleApplication({
+  String id = 'application-1',
+  String status = 'Submitted',
+}) => JobApplication(
+  id: id,
+  jobPostingId: 'job-1',
+  jobTitle: 'Flutter Engineer',
+  companyName: 'Northstar Labs',
+  jobLocation: 'Colombo',
+  coverNote: 'I have relevant Flutter delivery experience.',
+  status: status,
+  sourceWorkflowRunId: null,
+  statusHistory: [
+    ApplicationStatusEvent(
+      id: 'event-1',
+      previousStatus: null,
+      newStatus: status,
+      actorRole: 'JobSeeker',
+      note: 'Application submitted.',
+      createdAtUtc: DateTime.utc(2030),
+    ),
+  ],
+  notificationDeliveries: const [
+    NotificationDelivery(
+      eventType: 'ApplicationSubmitted',
+      provider: 'Resend',
+      status: 'Skipped',
+      attemptCount: 1,
+    ),
+  ],
+  createdAtUtc: DateTime.utc(2030),
+  updatedAtUtc: DateTime.utc(2030),
+);
+
+class FakeApplicationsDataSource implements ApplicationsDataSource {
+  List<JobApplication> items = [];
+  Object? error;
+  String? lastNote;
+
+  @override
+  Future<List<JobApplication>> list() async {
+    if (error != null) throw error!;
+    return items;
+  }
+
+  @override
+  Future<JobApplication> respond(String applicationId, String note) async {
+    if (error != null) throw error!;
+    lastNote = note;
+    return sampleApplication(id: applicationId);
+  }
+
+  @override
+  Future<JobApplication> submit({
+    required String jobPostingId,
+    required String coverNote,
+    String? sourceWorkflowRunId,
+  }) async {
+    if (error != null) throw error!;
+    lastNote = coverNote;
+    return sampleApplication();
+  }
+
+  @override
+  Future<JobApplication> withdraw(String applicationId, String note) async {
+    if (error != null) throw error!;
+    lastNote = note;
+    return sampleApplication(id: applicationId, status: 'Withdrawn');
   }
 }

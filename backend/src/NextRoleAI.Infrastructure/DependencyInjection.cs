@@ -7,12 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NextRoleAI.AgenticAI;
 using NextRoleAI.Application.AgentWorkflows;
+using NextRoleAI.Application.Applications;
 using NextRoleAI.Application.Authentication;
 using NextRoleAI.Application.Cvs;
 using NextRoleAI.Application.Jobs;
 using NextRoleAI.Application.Profiles;
 using NextRoleAI.Application.Recommendations;
 using NextRoleAI.Infrastructure.AgentWorkflows;
+using NextRoleAI.Infrastructure.Applications;
 using NextRoleAI.Infrastructure.Authentication;
 using NextRoleAI.Infrastructure.Cvs;
 using NextRoleAI.Infrastructure.Identity;
@@ -56,6 +58,9 @@ public static class DependencyInjection
 
         services.AddOptions<CvStorageOptions>()
             .Bind(configuration.GetSection(CvStorageOptions.SectionName));
+
+        services.AddOptions<NotificationOptions>()
+            .Bind(configuration.GetSection(NotificationOptions.SectionName));
 
         services.AddSingleton(TimeProvider.System);
 
@@ -126,6 +131,8 @@ public static class DependencyInjection
         services.AddSingleton<JobDiscoveryAgent>();
         services.AddSingleton<ValidationSafetyAgent>();
         services.AddScoped<IAgentWorkflowService, AgentWorkflowOrchestrator>();
+        services.AddSingleton<IApplicationNotificationSender, ResendApplicationNotificationSender>();
+        services.AddScoped<IApplicationService, ApplicationService>();
 
         return services;
     }

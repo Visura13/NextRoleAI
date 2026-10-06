@@ -119,7 +119,7 @@ class HomeScreen extends StatelessWidget {
             _ActionCard(
               icon: Icons.track_changes_outlined,
               title: 'Application status',
-              subtitle: 'Reserved for the cross-platform workflow in Part 8.',
+              subtitle: 'Submit applications and follow recruiter decisions.',
               onTap: () => context.push('/applications'),
             ),
           ],
