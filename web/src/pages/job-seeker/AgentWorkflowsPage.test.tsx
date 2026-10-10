@@ -75,11 +75,14 @@ describe('AgentWorkflowsPage', () => {
     } as never);
   });
 
-  it('shows validation evidence and requires explicit human approval', () => {
+  it('keeps shortlist decisions while hiding technical workflow details', () => {
     render(<AgentWorkflowsPage />);
 
     expect(screen.getByRole('heading', { name: /Backend Engineer/ })).toBeInTheDocument();
-    expect(screen.getByText(/ToolAllowList/)).toBeInTheDocument();
+    expect(screen.queryByText('Deterministic validation')).not.toBeInTheDocument();
+    expect(screen.queryByText('Execution history')).not.toBeInTheDocument();
+    expect(screen.queryByText('Human approval required')).not.toBeInTheDocument();
+    expect(screen.queryByText(/ToolAllowList/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Approve shortlist' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Reject' })).toBeEnabled();
   });
