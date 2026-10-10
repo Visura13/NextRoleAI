@@ -8,7 +8,7 @@ import '../support/fakes.dart';
 
 void main() {
   testWidgets(
-    'keeps decisions visible without technical sections or overflow',
+    'shows only run history and agentic search result cards',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(360, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -27,7 +27,18 @@ void main() {
       expect(find.text('Deterministic validation'), findsNothing);
       expect(find.text('Agent execution history'), findsNothing);
       expect(find.text('Human approval required'), findsNothing);
-      expect(find.text('Approve shortlist'), findsOneWidget);
+      expect(find.text('PendingApproval · Pending'), findsNothing);
+      expect(
+        find.text(
+          '2 job(s) passed deterministic validation and await Job Seeker approval.',
+        ),
+        findsNothing,
+      );
+      expect(find.text('Decision note (optional)'), findsNothing);
+      expect(find.text('Approve shortlist'), findsNothing);
+      expect(find.text('Request revision'), findsNothing);
+      expect(find.text('Reject'), findsNothing);
+      expect(find.text('Agentic search results'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

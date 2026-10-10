@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router';
 import useSWR from 'swr';
 import { api, ApiError, swrFetcher } from '../../api/client';
-import type { AgentDecisionType, AgentWorkflow, AgentWorkflowList } from '../../api/types';
+import type { AgentWorkflow, AgentWorkflowList } from '../../api/types';
 import { EmptyState, ErrorState, LoadingState, Notice } from '../../components/States';
 
 const defaultObjective = 'Find the best 3 software engineering jobs for my confirmed profile.';
@@ -11,8 +10,6 @@ export function AgentWorkflowsPage() {
   const { data, error, isLoading, mutate } = useSWR<AgentWorkflowList>('/api/agent-workflows?pageSize=10', swrFetcher, { shouldRetryOnError: false });
   const [objective, setObjective] = useState(defaultObjective);
   const [selected, setSelected] = useState<AgentWorkflow | null>(null);
-  const [feedback, setFeedback] = useState('');
-  const [revisedObjective, setRevisedObjective] = useState(defaultObjective);
   const [notice, setNotice] = useState<{ kind: 'success' | 'error' | 'info'; message: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const activeWorkflow = selected ?? data?.items[0] ?? null;
@@ -27,38 +24,13 @@ export function AgentWorkflowsPage() {
         body: JSON.stringify({ objective: objective.trim() }),
       }, true);
       setSelected(workflow);
-      setRevisedObjective(workflow.objective);
       await mutate();
       setNotice({
         kind: workflow.status === 'Failed' ? 'error' : 'info',
-        message: workflow.status === 'Failed' ? workflow.failureMessage ?? 'The workflow failed safely.' : 'The proposal is ready for review. Nothing is published until you approve it.',
+        message: workflow.status === 'Failed' ? workflow.failureMessage ?? 'The workflow failed safely.' : 'Your agentic job search is ready.',
       });
     } catch (requestError) {
       setNotice({ kind: 'error', message: requestError instanceof ApiError ? requestError.message : 'The workflow could not be started.' });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function decide(decision: AgentDecisionType) {
-    if (!activeWorkflow) return;
-    setBusy(true);
-    setNotice(null);
-    try {
-      const workflow = await api.request<AgentWorkflow>(`/api/agent-workflows/${activeWorkflow.id}/decision`, {
-        method: 'POST',
-        body: JSON.stringify({
-          decision,
-          feedback: feedback.trim(),
-          revisedObjective: decision === 'RequestRevision' ? revisedObjective.trim() : null,
-        }),
-      }, true);
-      setSelected(workflow);
-      setFeedback('');
-      await mutate();
-      setNotice({ kind: 'success', message: workflow.finalSummary ?? 'Your decision was recorded.' });
-    } catch (requestError) {
-      setNotice({ kind: 'error', message: requestError instanceof ApiError ? requestError.message : 'The decision could not be recorded.' });
     } finally {
       setBusy(false);
     }
@@ -69,7 +41,7 @@ export function AgentWorkflowsPage() {
 
   return (
     <div className="page-stack">
-      <header className="portal-header"><p className="eyebrow">Controlled Agentic AI</p><h1>Delegate a shortlist, keep the final say.</h1><p>Four specialized agents plan, inspect your confirmed profile, discover ranked roles, and validate the proposal. Publication always pauses for your approval.</p></header>
+      <header className="portal-header"><p className="eyebrow">Agentic job search</p><h1>Delegate the search. Discover your best-fit roles.</h1><p>Specialized agents use your confirmed profile to find and rank relevant opportunities.</p></header>
       {notice && <Notice kind={notice.kind}>{notice.message}</Notice>}
       <form className="surface-form" onSubmit={start}>
         <label>Job-search objective<textarea minLength={20} maxLength={500} rows={3} value={objective} onChange={(event) => setObjective(event.target.value)} /></label>
@@ -79,20 +51,18 @@ export function AgentWorkflowsPage() {
 
       {!data?.items.length && !activeWorkflow ? <EmptyState title="No workflow history" message="Start with a confirmed CV to create your first auditable shortlist." /> : (
         <div className="workflow-layout">
-          <aside className="workflow-history"><h2>Run history</h2>{data?.items.map((workflow) => <button className={activeWorkflow?.id === workflow.id ? 'workflow-history__item is-active' : 'workflow-history__item'} key={workflow.id} onClick={() => { setSelected(workflow); setRevisedObjective(workflow.objective); }} type="button"><strong>{workflow.status}</strong><span>{workflow.objective}</span><small>{new Date(workflow.createdAtUtc).toLocaleString()}</small></button>)}</aside>
-          {activeWorkflow && <WorkflowDetails workflow={activeWorkflow} busy={busy} feedback={feedback} revisedObjective={revisedObjective} onFeedback={setFeedback} onRevisedObjective={setRevisedObjective} onDecision={decide} />}
+          <aside className="workflow-history"><h2>Run history</h2>{data?.items.map((workflow) => <button className={activeWorkflow?.id === workflow.id ? 'workflow-history__item is-active' : 'workflow-history__item'} key={workflow.id} onClick={() => setSelected(workflow)} type="button"><span>{workflow.objective}</span><small>{new Date(workflow.createdAtUtc).toLocaleString()}</small></button>)}</aside>
+          {activeWorkflow && <WorkflowDetails workflow={activeWorkflow} />}
         </div>
       )}
     </div>
   );
 }
 
-function WorkflowDetails({ workflow, busy, feedback, revisedObjective, onFeedback, onRevisedObjective, onDecision }: { workflow: AgentWorkflow; busy: boolean; feedback: string; revisedObjective: string; onFeedback: (value: string) => void; onRevisedObjective: (value: string) => void; onDecision: (decision: AgentDecisionType) => void }) {
+function WorkflowDetails({ workflow }: { workflow: AgentWorkflow }) {
   return <section className="workflow-details">
-    <div className="cv-file-summary"><div><p className="eyebrow">Run {workflow.id.slice(0, 8)}</p><h2>{workflow.status}</h2><p>{workflow.finalSummary ?? workflow.objective}</p></div><span className={`status status--${workflow.status === 'Completed' ? 'published' : workflow.status === 'Failed' || workflow.status === 'Rejected' ? 'closed' : 'draft'}`}>{workflow.approvalStatus}</span></div>
     {workflow.failureMessage && <Notice kind="error">{workflow.failureCode}: {workflow.failureMessage}</Notice>}
-    <h3>Proposed shortlist</h3>
-    {!workflow.shortlist.length ? <p className="muted">No jobs were published by this run.</p> : <div className="agent-shortlist">{workflow.shortlist.map((item) => <article key={item.jobId}><span className="recommendation__score"><strong>{item.score}</strong><small>score</small></span><div><h4>#{item.rank} {item.title}</h4><p>{item.companyName} · {item.location} · {item.workMode}</p><small>{item.reasonSummary}</small>{item.isApproved && <p><Link className="text-link" to={`/job-seeker/applications?jobId=${item.jobId}&workflowId=${workflow.id}`}>Apply with this approved shortlist →</Link></p>}</div><span className={`status status--${item.isApproved ? 'published' : 'draft'}`}>{item.isApproved ? 'Published' : 'Proposed'}</span></article>)}</div>}
-    {workflow.status === 'PendingApproval' && <div className="workflow-decision-controls"><label>Decision note <span className="optional">Optional</span><textarea maxLength={1000} rows={2} value={feedback} onChange={(event) => onFeedback(event.target.value)} /></label><label>Revised objective<textarea minLength={20} maxLength={500} rows={3} value={revisedObjective} onChange={(event) => onRevisedObjective(event.target.value)} /></label><div className="button-row"><button className="button" disabled={busy} onClick={() => onDecision('Approve')} type="button">Approve shortlist</button><button className="button button--secondary" disabled={busy || revisedObjective.trim().length < 20} onClick={() => onDecision('RequestRevision')} type="button">Request revision</button><button className="button button--danger" disabled={busy} onClick={() => onDecision('Reject')} type="button">Reject</button></div></div>}
+    <h3>Agentic search results</h3>
+    {!workflow.shortlist.length ? <p className="muted">No matching jobs were found by this run.</p> : <div className="agent-shortlist">{workflow.shortlist.map((item) => <article key={item.jobId}><span className="recommendation__score"><strong>{item.score}</strong><small>score</small></span><div><h4>#{item.rank} {item.title}</h4><p>{item.companyName} · {item.location} · {item.workMode}</p><small>{item.reasonSummary}</small></div></article>)}</div>}
   </section>;
 }
