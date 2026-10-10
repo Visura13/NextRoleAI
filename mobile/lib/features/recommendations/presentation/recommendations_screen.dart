@@ -42,10 +42,10 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
               message: viewModel.errorMessage!,
               action: FilledButton(
                 onPressed: viewModel.cvRequired
-                    ? () => context.push('/cv')
+                    ? () => context.go('/profile')
                     : viewModel.load,
                 child: Text(
-                  viewModel.cvRequired ? 'Review my CV' : 'Try again',
+                  viewModel.cvRequired ? 'Complete my profile' : 'Try again',
                 ),
               ),
             )

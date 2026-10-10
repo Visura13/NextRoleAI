@@ -7,7 +7,6 @@ import '../features/applications/presentation/applications_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/auth/presentation/splash_screen.dart';
 import '../features/auth/state/auth_view_model.dart';
-import '../features/cv/presentation/cv_workspace_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/jobs/data/jobs_repository.dart';
 import '../features/jobs/presentation/job_details_screen.dart';
@@ -63,10 +62,7 @@ GoRouter createAppRouter({
         child: const JobDetailsScreen(),
       ),
     ),
-    GoRoute(
-      path: '/cv',
-      builder: (context, state) => const CvWorkspaceScreen(),
-    ),
+    GoRoute(path: '/cv', redirect: (context, state) => '/profile'),
     GoRoute(
       path: '/recommendations',
       builder: (context, state) => const RecommendationsScreen(),

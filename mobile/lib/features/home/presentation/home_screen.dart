@@ -54,13 +54,13 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
-                    Icons.description_outlined,
+                    Icons.auto_awesome_outlined,
                     color: AppTheme.lime,
                     size: 34,
                   ),
                   const SizedBox(height: 22),
                   Text(
-                    'Bring your CV into the picture.',
+                    'Discover the roles that fit you best.',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -68,17 +68,17 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Upload a PDF or DOCX, review the extracted profile, and keep control of the data used for matching.',
+                    'See AI-ranked opportunities based on your confirmed profile, with clear match strengths and skill gaps.',
                     style: TextStyle(color: Color(0xFFC4D2CC), height: 1.5),
                   ),
                   const SizedBox(height: 18),
                   FilledButton.tonal(
-                    onPressed: () => context.push('/cv'),
+                    onPressed: () => context.push('/recommendations'),
                     style: FilledButton.styleFrom(
                       backgroundColor: AppTheme.lime,
                       foregroundColor: AppTheme.forestDeep,
                     ),
-                    child: const Text('Review my CV'),
+                    child: const Text('View recommendations'),
                   ),
                 ],
               ),
