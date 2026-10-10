@@ -112,6 +112,7 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
             const SizedBox(height: 18),
             DropdownButtonFormField<String>(
               initialValue: model.selected?.id,
+              isExpanded: true,
               decoration: const InputDecoration(labelText: 'Workflow history'),
               items: model.items
                   .map(
@@ -230,82 +231,27 @@ class _WorkflowDetails extends StatelessWidget {
             ),
           ),
         ),
-      const SizedBox(height: 14),
-      ExpansionTile(
-        tilePadding: EdgeInsets.zero,
-        title: const Text('Deterministic validation'),
-        children: workflow.validationResults
-            .map(
-              (result) => ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(
-                  result.passed ? Icons.check_circle : Icons.cancel,
-                  color: result.passed ? Colors.green : Colors.red,
-                ),
-                title: Text(result.ruleName),
-                subtitle: Text(result.message),
-              ),
-            )
-            .toList(),
-      ),
-      ExpansionTile(
-        tilePadding: EdgeInsets.zero,
-        title: const Text('Agent execution history'),
-        children: workflow.steps
-            .map(
-              (step) => ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('${step.agentName} · ${step.status}'),
-                subtitle: Text(
-                  '${step.responsibility}\nTools: ${step.allowedTools.isEmpty ? 'none' : step.allowedTools.join(', ')}\n${step.toolCalls.map((call) => '${call.toolName}: ${call.succeeded ? 'success' : 'failed'}').join(' · ')}',
-                ),
-                isThreeLine: true,
-              ),
-            )
-            .toList(),
-      ),
       if (workflow.status == 'PendingApproval') ...[
-        const SizedBox(height: 14),
-        Card(
-          color: const Color(0xFFFFF4DF),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Human approval required',
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Approve only after reviewing the jobs and validation evidence. Revision reruns every agent and check.',
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: feedbackController,
-                  maxLength: 1000,
-                  maxLines: 2,
-                  decoration: const InputDecoration(labelText: 'Decision note'),
-                ),
-                FilledButton(
-                  onPressed: isBusy ? null : () => onDecision('Approve'),
-                  child: const Text('Approve shortlist'),
-                ),
-                OutlinedButton(
-                  onPressed: isBusy
-                      ? null
-                      : () => onDecision('RequestRevision'),
-                  child: const Text('Request revision'),
-                ),
-                TextButton(
-                  onPressed: isBusy ? null : () => onDecision('Reject'),
-                  child: const Text('Reject'),
-                ),
-              ],
-            ),
+        const SizedBox(height: 18),
+        TextField(
+          controller: feedbackController,
+          maxLength: 1000,
+          maxLines: 2,
+          decoration: const InputDecoration(
+            labelText: 'Decision note (optional)',
           ),
+        ),
+        FilledButton(
+          onPressed: isBusy ? null : () => onDecision('Approve'),
+          child: const Text('Approve shortlist'),
+        ),
+        OutlinedButton(
+          onPressed: isBusy ? null : () => onDecision('RequestRevision'),
+          child: const Text('Request revision'),
+        ),
+        TextButton(
+          onPressed: isBusy ? null : () => onDecision('Reject'),
+          child: const Text('Reject'),
         ),
       ],
     ],

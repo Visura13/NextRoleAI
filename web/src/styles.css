@@ -229,21 +229,11 @@ label small { color: var(--muted); font-weight: 400; }
 .workflow-history__item { display: grid; gap: 4px; border: 1px solid var(--line); border-radius: 12px; background: white; padding: 13px; text-align: left; color: inherit; cursor: pointer; }
 .workflow-history__item span { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .workflow-history__item.is-active { border-color: var(--forest); box-shadow: inset 3px 0 var(--forest); }
-.agent-shortlist,.agent-timeline,.validation-grid { display: grid; gap: 12px; }
+.agent-shortlist { display: grid; gap: 12px; }
 .agent-shortlist article { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
 .agent-shortlist .recommendation__score { position: static; width: 64px; height: 64px; border-width: 6px; }
 .agent-shortlist h4,.agent-shortlist p { margin: 0 0 3px; }
-.validation-grid { grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); }
-.validation-card { border: 1px solid var(--line); border-radius: 12px; padding: 13px; }
-.validation-card p { margin-bottom: 0; }
-.validation-card.is-passed { border-left: 4px solid #2f7d32; }
-.validation-card.is-failed { border-left: 4px solid #b42318; }
-.agent-timeline { list-style: none; padding: 0; }
-.agent-timeline>li { border-left: 3px solid var(--forest); padding: 4px 0 16px 16px; }
-.agent-timeline>li>div:first-child { display: flex; justify-content: space-between; gap: 16px; }
-.agent-timeline p { margin: 6px 0; }
-.tool-call { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; border-radius: 8px; background: var(--cream); padding: 8px 10px; }
-.approval-panel { margin-top: 16px; border: 1px solid var(--orange); border-radius: 16px; background: #fff8ef; padding: 16px; }
+.workflow-decision-controls { display: grid; gap: 12px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 18px; }
 .application-form h2 { margin-bottom: 4px; }
 .application-list { display: grid; gap: 18px; }
 .application-card { display: grid; gap: 18px; background: white; border: 1px solid var(--line); border-radius: 18px 18px 18px 5px; padding: 22px; box-shadow: var(--shadow); }
