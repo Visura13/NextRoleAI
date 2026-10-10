@@ -73,6 +73,7 @@ export interface JobSeekerProfile {
   summary: string;
   location: string;
   preferredJobTitle: string;
+  preferredSalary: number | null;
   yearsOfExperience: number;
   skills: string[];
   updatedAtUtc: string;
@@ -155,6 +156,7 @@ export interface MatchBreakdown {
   experienceFit: number;
   educationFit: number;
   locationFit: number;
+  salaryFit: number;
   total: number;
 }
 

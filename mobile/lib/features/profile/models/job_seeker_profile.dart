@@ -4,6 +4,7 @@ class JobSeekerProfile {
     required this.summary,
     required this.location,
     required this.preferredJobTitle,
+    required this.preferredSalary,
     required this.yearsOfExperience,
     required this.skills,
   });
@@ -12,6 +13,7 @@ class JobSeekerProfile {
   final String summary;
   final String location;
   final String preferredJobTitle;
+  final num? preferredSalary;
   final int yearsOfExperience;
   final List<String> skills;
 
@@ -20,6 +22,7 @@ class JobSeekerProfile {
     summary: '',
     location: '',
     preferredJobTitle: '',
+    preferredSalary: null,
     yearsOfExperience: 0,
     skills: [],
   );
@@ -30,6 +33,7 @@ class JobSeekerProfile {
         summary: json['summary'] as String,
         location: json['location'] as String,
         preferredJobTitle: json['preferredJobTitle'] as String,
+        preferredSalary: json['preferredSalary'] as num?,
         yearsOfExperience: json['yearsOfExperience'] as int,
         skills: (json['skills'] as List<dynamic>)
             .map((skill) => skill.toString())
@@ -41,6 +45,7 @@ class JobSeekerProfile {
     'summary': summary,
     'location': location,
     'preferredJobTitle': preferredJobTitle,
+    'preferredSalary': preferredSalary,
     'yearsOfExperience': yearsOfExperience,
     'skills': skills,
   };

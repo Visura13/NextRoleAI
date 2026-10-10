@@ -16,7 +16,10 @@ public sealed class AiJobRecommendationRankerTests
         var reactJob = CreateJob(
             "React Frontend Engineer",
             "Build accessible React interfaces with TypeScript.",
-            [new JobSkillInput("React", true), new JobSkillInput("TypeScript", true)]);
+            [new JobSkillInput("React", true), new JobSkillInput("TypeScript", true)],
+            180_000m,
+            250_000m,
+            "LKR");
         var backendJob = CreateJob(
             "Java Backend Engineer",
             "Build Java services.",
@@ -26,11 +29,12 @@ public sealed class AiJobRecommendationRankerTests
               "rankings": [
                 {
                   "jobId": "{{reactJob.Id}}",
-                  "skillsFit": 38,
+                  "skillsFit": 34,
                   "roleFit": 24,
                   "experienceFit": 12,
                   "educationFit": 9,
                   "locationFit": 10,
+                  "salaryFit": 4,
                   "matchedSkills": ["React", "TypeScript", "Invented skill"],
                   "missingRequiredSkills": [],
                   "reasons": [
@@ -45,6 +49,7 @@ public sealed class AiJobRecommendationRankerTests
                   "experienceFit": 8,
                   "educationFit": 9,
                   "locationFit": 10,
+                  "salaryFit": 3,
                   "matchedSkills": [],
                   "missingRequiredSkills": ["Java", "Not a listed requirement"],
                   "reasons": [
@@ -55,18 +60,23 @@ public sealed class AiJobRecommendationRankerTests
               ]
             }
             """;
-        var ranker = CreateRanker(response);
+        var languageModel = new FakeLanguageModel(response);
+        var ranker = CreateRanker(languageModel);
 
         var results = await ranker.RankAsync(CreateCandidate(), [reactJob, backendJob]);
 
         var react = Assert.Single(results, item => item.JobId == reactJob.Id);
         var backend = Assert.Single(results, item => item.JobId == backendJob.Id);
         Assert.Equal(93m, react.Score);
-        Assert.Equal(38m, react.Breakdown.SkillsFit);
+        Assert.Equal(34m, react.Breakdown.SkillsFit);
+        Assert.Equal(4m, react.Breakdown.SalaryFit);
         Assert.Equal(["React", "TypeScript"], react.MatchedSkills);
         Assert.True(react.Score > backend.Score);
         Assert.Equal(["Java"], backend.MissingRequiredSkills);
         Assert.Equal("ai-semantic-ranking-v1:test-model", ranker.AlgorithmVersion);
+        Assert.Contains("\"preferredMonthlySalary\":200000", languageModel.LastUserPrompt);
+        Assert.Contains("\"salaryMinimum\":180000", languageModel.LastUserPrompt);
+        Assert.Contains("salaryFit", languageModel.LastSystemPrompt);
     }
 
     [Fact]
@@ -103,6 +113,7 @@ public sealed class AiJobRecommendationRankerTests
                     experienceFit = 12,
                     educationFit = 8,
                     locationFit = 9,
+                    salaryFit = 3,
                     matchedSkills = new[] { "React" },
                     missingRequiredSkills = Array.Empty<string>(),
                     reasons = new[]
@@ -142,6 +153,7 @@ public sealed class AiJobRecommendationRankerTests
             "Full Stack Developer Intern",
             "Frontend Engineer",
             "Colombo",
+            200_000m,
             "Builds responsive web applications with React and TypeScript.",
             1,
             ["React", "TypeScript", "JavaScript", "Node.js"],
@@ -156,7 +168,10 @@ public sealed class AiJobRecommendationRankerTests
     private static JobResult CreateJob(
         string title,
         string description,
-        IReadOnlyCollection<JobSkillInput> skills) =>
+        IReadOnlyCollection<JobSkillInput> skills,
+        decimal? salaryMinimum = null,
+        decimal? salaryMaximum = null,
+        string? salaryCurrency = null) =>
         new(
             Guid.NewGuid(),
             Guid.NewGuid(),
@@ -167,9 +182,9 @@ public sealed class AiJobRecommendationRankerTests
             EmploymentType.FullTime,
             WorkMode.Hybrid,
             1,
-            null,
-            null,
-            null,
+            salaryMinimum,
+            salaryMaximum,
+            salaryCurrency,
             JobStatus.Published,
             DateTimeOffset.UtcNow,
             DateTimeOffset.UtcNow.AddDays(30),
@@ -183,12 +198,18 @@ public sealed class AiJobRecommendationRankerTests
 
         public int CallCount { get; private set; }
 
+        public string LastSystemPrompt { get; private set; } = string.Empty;
+
+        public string LastUserPrompt { get; private set; } = string.Empty;
+
         public Task<string> GenerateJsonAsync(
             string systemPrompt,
             string userPrompt,
             CancellationToken cancellationToken = default)
         {
             CallCount++;
+            LastSystemPrompt = systemPrompt;
+            LastUserPrompt = userPrompt;
             return Task.FromResult(this.responses.Dequeue());
         }
     }

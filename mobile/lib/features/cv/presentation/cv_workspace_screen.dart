@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/widgets/states.dart';
@@ -67,7 +68,7 @@ class _CvWorkspaceScreenState extends State<CvWorkspaceScreen> {
         .where((skill) => skill.isNotEmpty)
         .toSet()
         .toList(growable: false);
-    await context.read<CvSelectionViewModel>().confirm(
+    final succeeded = await context.read<CvSelectionViewModel>().confirm(
       CvProfileUpdate(
         candidateName: _name.text.trim(),
         email: _email.text.trim(),
@@ -79,6 +80,7 @@ class _CvWorkspaceScreenState extends State<CvWorkspaceScreen> {
         skills: skills,
       ),
     );
+    if (succeeded && mounted) context.go('/recommendations');
   }
 
   Future<void> _delete() async {

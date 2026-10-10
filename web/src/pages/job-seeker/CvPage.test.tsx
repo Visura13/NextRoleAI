@@ -1,6 +1,9 @@
 import { cleanup, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route, Routes } from 'react-router';
 import useSWR from 'swr';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { api } from '../../api/client';
 import type { CvProfile } from '../../api/types';
 import { CvPage } from './CvPage';
 
@@ -63,10 +66,11 @@ describe('CvPage', () => {
       isLoading: false,
       mutate: vi.fn(),
     } as never);
+    vi.mocked(api.request).mockResolvedValue({ ...aiProfile, status: 'Confirmed' });
   });
 
   it('shows the AI quality assessment and editable higher education', () => {
-    render(<CvPage />);
+    render(<MemoryRouter><CvPage /></MemoryRouter>);
 
     expect(screen.getByRole('heading', { name: 'CV quality review' })).toBeInTheDocument();
     expect(screen.getByLabelText('Overall CV quality score 82 out of 100')).toBeInTheDocument();
@@ -85,10 +89,26 @@ describe('CvPage', () => {
       mutate: vi.fn(),
     } as never);
 
-    render(<CvPage />);
+    render(<MemoryRouter><CvPage /></MemoryRouter>);
 
     expect(screen.getByText(/Basic extraction is active/)).toBeInTheDocument();
     expect(screen.getByText(/No higher-education qualification was extracted/)).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'CV quality review' })).not.toBeInTheDocument();
+  });
+
+  it('redirects to recommendations after confirming the CV profile', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={['/job-seeker/cv']}>
+        <Routes>
+          <Route path="/job-seeker/cv" element={<CvPage />} />
+          <Route path="/job-seeker/recommendations" element={<h1>Recommendations destination</h1>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Confirm CV profile' }));
+
+    expect(await screen.findByRole('heading', { name: 'Recommendations destination' })).toBeInTheDocument();
   });
 });

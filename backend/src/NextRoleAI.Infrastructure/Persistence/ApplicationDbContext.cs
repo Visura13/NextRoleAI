@@ -82,6 +82,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.Property(profile => profile.Summary).HasMaxLength(2000).IsRequired();
             entity.Property(profile => profile.Location).HasMaxLength(150).IsRequired();
             entity.Property(profile => profile.PreferredJobTitle).HasMaxLength(150).IsRequired();
+            entity.Property(profile => profile.PreferredSalary).HasPrecision(18, 2);
             entity.HasIndex(profile => profile.UserId).IsUnique();
             entity.HasOne<ApplicationUser>()
                 .WithOne()

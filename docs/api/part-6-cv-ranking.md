@@ -17,7 +17,7 @@ Supported endpoints, all restricted to the `JobSeeker` role:
 - `DELETE /api/cv` deletes the current CV or returns `404`.
 - `GET /api/recommendations?limit=20` returns ranked published jobs; it returns `409` until the CV profile is confirmed and `503` if AI ranking is unavailable.
 
-The profile update contains `candidateName`, `email`, `phone`, `location`, `currentJobTitle`, `professionalSummary`, `yearsExperience`, one to fifty `skills`, and reviewable tertiary/professional `education` entries.
+The CV profile update contains `candidateName`, `email`, `phone`, `location`, `currentJobTitle`, `professionalSummary`, `yearsExperience`, one to fifty `skills`, and reviewable tertiary/professional `education` entries. The separate Job Seeker profile includes an optional `preferredSalary`, interpreted as the minimum monthly amount in LKR. React and Flutter redirect to Recommendations after a successful CV confirmation or Job Seeker profile save.
 
 ## Storage and privacy
 
@@ -39,13 +39,14 @@ The `ai-semantic-ranking-v1:<model>` score is out of 100. The model evaluates al
 
 | Component | Points | Rule |
 | --- | ---: | --- |
-| Skills fit | 40 | Technical, domain, and transferable skill evidence |
+| Skills fit | 35 | Technical, domain, and transferable skill evidence |
 | Role fit | 25 | Alignment with the title and described responsibilities |
 | Experience fit | 15 | Relevant depth compared with the stated minimum |
 | Education fit | 10 | Relevant higher/professional education, without penalising jobs that do not require it |
 | Location fit | 10 | Location and work-mode compatibility |
+| Salary fit | 5 | Advertised range compared with preferred minimum salary; neutral when missing or currencies differ |
 
-Candidate and job text is treated as untrusted data, protected characteristics are excluded, every job ID and component bound is validated, and evidence lists are restricted to supplied candidate/job values. Jobs are processed in bounded batches of ten; every supplied job must appear exactly once within its batch with at least two reasons. The server sums the bounded components and shows no ranking if validation fails. Successful results are cached for ten minutes and automatically invalidated by CV, profile, job, or model-version changes to reduce provider cost.
+Candidate and job text is treated as untrusted data, protected characteristics are excluded, every job ID and component bound is validated, and evidence lists are restricted to supplied candidate/job values. Jobs are processed in bounded batches of ten; every supplied job must appear exactly once within its batch with at least two reasons. The server sums the bounded components and shows no ranking if validation fails. Successful results are cached for 12 hours and automatically invalidated by CV, profile, job, or model-version changes to reduce provider cost while still including newly published or updated jobs on the next request.
 
 ## Known limits
 

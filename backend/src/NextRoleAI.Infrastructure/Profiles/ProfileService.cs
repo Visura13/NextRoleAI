@@ -53,6 +53,7 @@ internal sealed class ProfileService(
         profile.Summary = update.Summary.Trim();
         profile.Location = update.Location.Trim();
         profile.PreferredJobTitle = update.PreferredJobTitle.Trim();
+        profile.PreferredSalary = update.PreferredSalary;
         profile.YearsOfExperience = update.YearsOfExperience;
         profile.UpdatedAtUtc = now;
 
@@ -136,6 +137,7 @@ internal sealed class ProfileService(
             profile.Summary,
             profile.Location,
             profile.PreferredJobTitle,
+            profile.PreferredSalary,
             profile.YearsOfExperience,
             profile.Skills
                 .Select(skill => skill.Name)

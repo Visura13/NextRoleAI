@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router';
 import useSWR from 'swr';
 import { api, ApiError, swrFetcher } from '../../api/client';
 import type { CvProfile } from '../../api/types';
@@ -114,6 +115,7 @@ function AnalysisSummary({ profile }: { profile: CvProfile }) {
 }
 
 export function CvPage() {
+  const navigate = useNavigate();
   const { data, error, isLoading, mutate } = useSWR<CvProfile>('/api/cv', swrFetcher, { shouldRetryOnError: false });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [editedForm, setForm] = useState<CvForm | null>(null);
@@ -201,7 +203,7 @@ export function CvPage() {
       }, true);
       await mutate(saved, { revalidate: false });
       setForm(null);
-      setFeedback({ kind: 'success', message: 'CV profile confirmed. Your explainable recommendations are ready.' });
+      navigate('/job-seeker/recommendations', { replace: true });
     } catch (requestError) {
       setFeedback({ kind: 'error', message: requestError instanceof ApiError ? requestError.message : 'The structured CV profile could not be saved.' });
     } finally {

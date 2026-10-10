@@ -893,6 +893,10 @@ namespace NextRoleAI.Infrastructure.Persistence.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
+                    b.Property<decimal?>("PreferredSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.Property<string>("Summary")
                         .IsRequired()
                         .HasMaxLength(2000)

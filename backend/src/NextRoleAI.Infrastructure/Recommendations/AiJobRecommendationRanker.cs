@@ -28,12 +28,15 @@ internal sealed class AiJobRecommendationRanker(
         evidence justifies it. Do not invent experience, education, skills, or job requirements.
 
         Score each job independently with this 100-point rubric:
-        - skillsFit: 0-40 for technical, domain, and transferable skills.
+        - skillsFit: 0-35 for technical, domain, and transferable skills.
         - roleFit: 0-25 for title, responsibilities, and demonstrated work alignment.
         - experienceFit: 0-15 for relevant depth and the stated minimum experience.
         - educationFit: 0-10 for relevant higher education; award full credit when the job
           does not require education and the candidate is otherwise suitably qualified.
         - locationFit: 0-10 for location and work-mode compatibility.
+        - salaryFit: 0-5 for the advertised range compared with the candidate's preferred
+          minimum monthly salary. Use a neutral 3 when either side omits salary. Compare only
+          matching currencies and use a neutral 3 instead of estimating currency conversion.
 
         Use the full score range and make meaningful distinctions between jobs. matchedSkills
         must use names from candidate.skills. missingRequiredSkills must use names from the
@@ -49,6 +52,7 @@ internal sealed class AiJobRecommendationRanker(
             "experienceFit": 0,
             "educationFit": 0,
             "locationFit": 0,
+            "salaryFit": 0,
             "matchedSkills": ["candidate skill"],
             "missingRequiredSkills": ["required job skill"],
             "reasons": ["specific explanation"]
@@ -91,6 +95,8 @@ internal sealed class AiJobRecommendationRanker(
                     candidate.CurrentJobTitle,
                     candidate.PreferredJobTitle,
                     candidate.PreferredLocation,
+                    preferredMonthlySalary = candidate.PreferredSalary,
+                    preferredSalaryCurrency = "LKR",
                     candidate.ProfessionalSummary,
                     candidate.YearsExperience,
                     candidate.Skills,
@@ -112,6 +118,9 @@ internal sealed class AiJobRecommendationRanker(
                     workMode = job.WorkMode.ToString(),
                     employmentType = job.EmploymentType.ToString(),
                     job.MinimumYearsExperience,
+                    job.SalaryMinimum,
+                    job.SalaryMaximum,
+                    job.SalaryCurrency,
                     requiredSkills = job.Skills
                         .Where(skill => skill.IsRequired)
                         .Select(skill => skill.Name),
@@ -166,18 +175,20 @@ internal sealed class AiJobRecommendationRanker(
                 throw new JsonException("AI ranking returned an unknown or duplicate job ID.");
             }
 
-            ValidateScore(item.SkillsFit, 40, nameof(item.SkillsFit));
+            ValidateScore(item.SkillsFit, 35, nameof(item.SkillsFit));
             ValidateScore(item.RoleFit, 25, nameof(item.RoleFit));
             ValidateScore(item.ExperienceFit, 15, nameof(item.ExperienceFit));
             ValidateScore(item.EducationFit, 10, nameof(item.EducationFit));
             ValidateScore(item.LocationFit, 10, nameof(item.LocationFit));
+            ValidateScore(item.SalaryFit, 5, nameof(item.SalaryFit));
 
             var breakdown = new MatchBreakdown(
                 item.SkillsFit!.Value,
                 item.RoleFit!.Value,
                 item.ExperienceFit!.Value,
                 item.EducationFit!.Value,
-                item.LocationFit!.Value);
+                item.LocationFit!.Value,
+                item.SalaryFit!.Value);
             var matchedSkills = (item.MatchedSkills ?? [])
                 .Select(Normalise)
                 .Where(candidateSkills.ContainsKey)
@@ -273,6 +284,7 @@ internal sealed record RawJobRanking(
     decimal? ExperienceFit,
     decimal? EducationFit,
     decimal? LocationFit,
+    decimal? SalaryFit,
     IReadOnlyCollection<string>? MatchedSkills,
     IReadOnlyCollection<string>? MissingRequiredSkills,
     IReadOnlyCollection<string>? Reasons);

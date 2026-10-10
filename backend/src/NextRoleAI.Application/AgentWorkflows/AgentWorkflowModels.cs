@@ -129,6 +129,7 @@ public sealed record CandidateProfileToolOutput(
     string CurrentJobTitle,
     string PreferredJobTitle,
     string Location,
+    decimal? PreferredSalary,
     int YearsExperience,
     IReadOnlyCollection<string> Skills);
 

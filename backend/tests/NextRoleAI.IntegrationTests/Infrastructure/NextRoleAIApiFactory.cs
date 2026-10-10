@@ -93,7 +93,7 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
                         .Where(skill => skill.IsRequired && !candidateSkills.Contains(skill.Name))
                         .Select(skill => skill.Name)
                         .ToArray();
-                    var breakdown = new MatchBreakdown(40m, 25m, 15m, 10m, 10m);
+                    var breakdown = new MatchBreakdown(35m, 25m, 15m, 10m, 10m, 5m);
                     return new AiJobMatchScore(
                         job.Id,
                         breakdown.Total,

@@ -42,6 +42,7 @@ public sealed class CvAndRecommendationEndpointsTests(NextRoleAIApiFactory facto
                 "Builds reliable APIs.",
                 "Colombo",
                 "Software Engineer",
+                250_000m,
                 3,
                 ["C#", "PostgreSQL"]));
         profileResponse.EnsureSuccessStatusCode();
