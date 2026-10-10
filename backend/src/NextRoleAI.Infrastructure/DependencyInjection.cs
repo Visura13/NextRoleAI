@@ -59,6 +59,19 @@ public static class DependencyInjection
         services.AddOptions<CvStorageOptions>()
             .Bind(configuration.GetSection(CvStorageOptions.SectionName));
 
+        services.AddOptions<CvAiOptions>()
+            .Bind(configuration.GetSection(CvAiOptions.SectionName))
+            .Validate(
+                options => !options.Enabled ||
+                    (!string.IsNullOrWhiteSpace(options.ApiKey) &&
+                     !string.IsNullOrWhiteSpace(options.Model) &&
+                     Uri.TryCreate(options.BaseUrl, UriKind.Absolute, out var uri) &&
+                     uri.Scheme == Uri.UriSchemeHttps &&
+                     options.TimeoutSeconds is >= 5 and <= 120 &&
+                     options.MaximumInputCharacters is >= 1000 and <= 50_000),
+                "Enabled CV AI requires an HTTPS base URL, API key, model, valid timeout, and input limit.")
+            .ValidateOnStart();
+
         services.AddOptions<NotificationOptions>()
             .Bind(configuration.GetSection(NotificationOptions.SectionName));
 
@@ -118,6 +131,8 @@ public static class DependencyInjection
         services.AddSingleton<ICvFileStore, LocalCvFileStore>();
         services.AddSingleton<ICvTextExtractor, CvTextExtractor>();
         services.AddSingleton<ICvProfileParser, DeterministicCvProfileParser>();
+        services.AddSingleton<ICvLanguageModelClient, OpenAiCompatibleCvLanguageModelClient>();
+        services.AddSingleton<ICvAnalyzer, AiCvAnalyzer>();
         services.AddScoped<ICvService, CvService>();
         services.AddSingleton<IJobMatchScorer, DeterministicJobMatchScorer>();
         services.AddScoped<IRecommendationService, RecommendationService>();

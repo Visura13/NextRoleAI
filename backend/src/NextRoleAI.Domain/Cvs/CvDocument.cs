@@ -34,6 +34,20 @@ public sealed class CvDocument
 
     public int YearsExperience { get; set; }
 
+    public string EducationJson { get; set; } = "[]";
+
+    public int? QualityScore { get; set; }
+
+    public string? QualityAssessmentJson { get; set; }
+
+    public string AnalysisMethod { get; set; } = "deterministic";
+
+    public string? AnalysisModel { get; set; }
+
+    public string AnalysisPromptVersion { get; set; } = "deterministic-v1";
+
+    public DateTimeOffset? AnalyzedAtUtc { get; set; }
+
     public string? FailureReason { get; set; }
 
     public DateTimeOffset CreatedAtUtc { get; set; }

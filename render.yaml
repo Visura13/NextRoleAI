@@ -34,6 +34,14 @@ services:
         sync: false
       - key: CvStorage__RootPath
         value: /tmp/nextroleai-cvs
+      - key: CvAi__Enabled
+        value: "false"
+      - key: CvAi__BaseUrl
+        value: https://api.openai.com/v1/
+      - key: CvAi__ApiKey
+        sync: false
+      - key: CvAi__Model
+        sync: false
       - key: Notifications__Enabled
         value: "false"
       - key: Notifications__ResendApiKey

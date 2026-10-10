@@ -27,6 +27,8 @@ The original file is never stored in Git or a web-public directory. With no over
 $env:CvStorage__RootPath = "D:\private-nextroleai-cvs"
 ```
 
+AI-assisted profile extraction and CV-quality review are optional and disabled by default. Configure an OpenAI-compatible chat-completions provider through `CvAi__Enabled`, `CvAi__BaseUrl`, `CvAi__ApiKey`, and `CvAi__Model`. The provider receives redacted CV text, returns structured JSON, and is constrained by deterministic evidence validation. Only tertiary or professional education such as certificates, diplomas and degrees is retained; school-level O/L and A/L entries are excluded. If the provider times out, fails, or returns invalid data, upload continues with deterministic extraction and no quality score.
+
 Only metadata and extracted information are returned by the API; this increment deliberately has no file-download endpoint. The database stores a SHA-256 checksum for integrity and traceability. Local storage is for development and marking. Production should use encrypted private object storage, retention/deletion controls, malware scanning, and backups.
 
 ## Ranking contract

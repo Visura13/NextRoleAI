@@ -168,6 +168,11 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
             entity.Property(document => document.Location).HasMaxLength(150).IsRequired();
             entity.Property(document => document.CurrentJobTitle).HasMaxLength(150).IsRequired();
             entity.Property(document => document.ProfessionalSummary).HasMaxLength(2000).IsRequired();
+            entity.Property(document => document.EducationJson).HasColumnType("jsonb").IsRequired();
+            entity.Property(document => document.QualityAssessmentJson).HasColumnType("jsonb");
+            entity.Property(document => document.AnalysisMethod).HasMaxLength(50).IsRequired();
+            entity.Property(document => document.AnalysisModel).HasMaxLength(100);
+            entity.Property(document => document.AnalysisPromptVersion).HasMaxLength(50).IsRequired();
             entity.Property(document => document.FailureReason).HasMaxLength(500);
             entity.HasIndex(document => document.UserId).IsUnique();
             entity.HasIndex(document => document.StorageKey).IsUnique();

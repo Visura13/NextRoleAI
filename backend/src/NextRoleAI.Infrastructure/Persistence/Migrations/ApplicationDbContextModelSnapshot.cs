@@ -580,6 +580,23 @@ namespace NextRoleAI.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AnalysisMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("AnalysisModel")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("AnalysisPromptVersion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset?>("AnalyzedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("CandidateName")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -602,6 +619,10 @@ namespace NextRoleAI.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)");
+
+                    b.Property<string>("EducationJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("ExtractedText")
                         .IsRequired()
@@ -631,6 +652,12 @@ namespace NextRoleAI.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("QualityAssessmentJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int?>("QualityScore")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Sha256Checksum")
                         .IsRequired()

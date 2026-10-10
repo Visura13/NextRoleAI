@@ -62,6 +62,18 @@ public sealed class CvsController(ICvService cvService) : ControllerBase
             return ValidationProblem(ModelState);
         }
 
+        if ((request.Education ?? []).Any(item =>
+                !CvEducationPolicy.IsSupported(
+                    item.Qualification,
+                    item.FieldOfStudy,
+                    item.Institution)))
+        {
+            ModelState.AddModelError(
+                nameof(request.Education),
+                "Education accepts tertiary or professional qualifications such as certificates, diplomas, and degrees; school-level O/L and A/L entries are excluded.");
+            return ValidationProblem(ModelState);
+        }
+
         var result = await cvService.ConfirmProfileAsync(
             GetUserId(),
             new CvProfileUpdate(
@@ -72,7 +84,16 @@ public sealed class CvsController(ICvService cvService) : ControllerBase
                 request.CurrentJobTitle,
                 request.ProfessionalSummary,
                 request.YearsExperience,
-                request.Skills),
+                request.Skills,
+                (request.Education ?? [])
+                    .Select(item => new CvEducationItem(
+                        item.Qualification,
+                        item.FieldOfStudy,
+                        item.Institution,
+                        item.Status,
+                        string.Empty,
+                        1m))
+                    .ToArray()),
             cancellationToken);
 
         return result.Succeeded ? Ok(result.Cv) : NotFound();
