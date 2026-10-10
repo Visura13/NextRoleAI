@@ -40,7 +40,8 @@ internal sealed class AiJobRecommendationRanker(
 
         Use the full score range and make meaningful distinctions between jobs. matchedSkills
         must use names from candidate.skills. missingRequiredSkills must use names from the
-        job's requiredSkills. Give two to five concise, evidence-based reasons for each job.
+        job's requiredSkills and must never include a skill already present in candidate.skills,
+        ignoring case and whitespace. Give two to five concise, evidence-based reasons for each job.
         Return every supplied job exactly once and use its jobId unchanged.
 
         Return one JSON object only, with exactly this shape:
@@ -205,7 +206,9 @@ internal sealed class AiJobRecommendationRanker(
                     StringComparer.OrdinalIgnoreCase);
             var missingRequiredSkills = (item.MissingRequiredSkills ?? [])
                 .Select(Normalise)
-                .Where(requiredSkills.ContainsKey)
+                .Where(skill =>
+                    requiredSkills.ContainsKey(skill) &&
+                    !candidateSkills.ContainsKey(skill))
                 .Select(skill => requiredSkills[skill])
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Take(50)

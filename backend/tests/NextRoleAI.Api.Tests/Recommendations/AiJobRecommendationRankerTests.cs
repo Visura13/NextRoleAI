@@ -93,6 +93,48 @@ public sealed class AiJobRecommendationRankerTests
     }
 
     [Fact]
+    public async Task RankAsync_RemovesRequiredSkillsAlreadyPresentInCandidateProfile()
+    {
+        var job = CreateJob(
+            "React Frontend Engineer",
+            "Build React interfaces with TypeScript and CSS.",
+            [
+                new JobSkillInput("CSS", true),
+                new JobSkillInput("React", true),
+                new JobSkillInput("TypeScript", true)
+            ]);
+        var response = $$"""
+            {
+              "rankings": [{
+                "jobId": "{{job.Id}}",
+                "skillsFit": 35,
+                "roleFit": 25,
+                "experienceFit": 12,
+                "educationFit": 9,
+                "locationFit": 10,
+                "salaryFit": 3,
+                "matchedSkills": ["CSS", "React", "TypeScript"],
+                "missingRequiredSkills": ["css", " react ", "TypeScript"],
+                "reasons": [
+                  "The candidate lists all required frontend technologies.",
+                  "The candidate's experience aligns with the role responsibilities."
+                ]
+              }]
+            }
+            """;
+        var ranker = CreateRanker(response);
+        var candidate = CreateCandidate() with
+        {
+            Skills = ["CSS", "React", "TypeScript", "JavaScript"]
+        };
+
+        var result = Assert.Single(await ranker.RankAsync(candidate, [job]));
+
+        Assert.Empty(result.MissingRequiredSkills);
+        Assert.Equal(["CSS", "React", "TypeScript"], result.MatchedSkills);
+    }
+
+    [Fact]
     public async Task RankAsync_ProcessesLargeJobSetsInBoundedBatches()
     {
         var jobs = Enumerable.Range(1, 11)
