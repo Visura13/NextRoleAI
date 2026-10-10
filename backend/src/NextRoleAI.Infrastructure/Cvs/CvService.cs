@@ -115,12 +115,12 @@ internal sealed class CvService(
         cv.Sha256Checksum = checksum;
         cv.Status = CvProcessingStatus.NeedsReview;
         cv.ExtractedText = extractedText;
-        cv.CandidateName = parsed.CandidateName;
-        cv.Email = parsed.Email;
-        cv.Phone = parsed.Phone;
-        cv.Location = parsed.Location;
-        cv.CurrentJobTitle = parsed.CurrentJobTitle;
-        cv.ProfessionalSummary = parsed.ProfessionalSummary;
+        cv.CandidateName = LimitLength(parsed.CandidateName, 150);
+        cv.Email = LimitLength(parsed.Email, 254);
+        cv.Phone = LimitLength(parsed.Phone, 40);
+        cv.Location = LimitLength(parsed.Location, 150);
+        cv.CurrentJobTitle = LimitLength(parsed.CurrentJobTitle, 150);
+        cv.ProfessionalSummary = LimitLength(parsed.ProfessionalSummary, 2000);
         cv.YearsExperience = parsed.YearsExperience;
         cv.FailureReason = null;
         cv.UpdatedAtUtc = now;
@@ -270,6 +270,14 @@ internal sealed class CvService(
         }
 
         return safe.Length <= 255 ? safe : safe[..255];
+    }
+
+    private static string LimitLength(string value, int maximumLength)
+    {
+        var trimmed = value.Trim();
+        return trimmed.Length <= maximumLength
+            ? trimmed
+            : trimmed[..maximumLength].TrimEnd();
     }
 
     private static CvResult ToResult(CvDocument cv) =>

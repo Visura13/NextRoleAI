@@ -5,6 +5,8 @@ namespace NextRoleAI.Infrastructure.Cvs;
 
 internal sealed partial class DeterministicCvProfileParser : ICvProfileParser
 {
+    private const int MaximumCurrentJobTitleLength = 150;
+
     private static readonly string[] KnownSkills =
     [
         "ASP.NET Core", "C#", "Dart", "Docker", "Entity Framework Core",
@@ -34,6 +36,7 @@ internal sealed partial class DeterministicCvProfileParser : ICvProfileParser
             ? Math.Clamp(value, 0, 80)
             : 0;
         var currentTitle = lines.FirstOrDefault(line =>
+            line.Length <= MaximumCurrentJobTitleLength &&
             TitleWords.Any(word => line.Contains(word, StringComparison.OrdinalIgnoreCase))) ??
             string.Empty;
         var skills = KnownSkills
