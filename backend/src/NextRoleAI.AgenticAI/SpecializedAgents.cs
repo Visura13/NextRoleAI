@@ -9,11 +9,7 @@ public sealed partial class PlanningAgent(ObjectiveGuard objectiveGuard)
     public WorkflowPlanOutput Execute(string objective)
     {
         var safeObjective = objectiveGuard.ValidateAndNormalise(objective);
-        var countMatch = CountRegex().Match(safeObjective);
-        var desiredCount = countMatch.Success &&
-            int.TryParse(countMatch.Groups[1].Value, out var parsedCount)
-                ? Math.Clamp(parsedCount, 1, 5)
-                : 3;
+        var desiredCount = ResolveDesiredCount(safeObjective);
         var remoteOnly = safeObjective.Contains("remote", StringComparison.OrdinalIgnoreCase) &&
             !safeObjective.Contains("hybrid", StringComparison.OrdinalIgnoreCase);
 
@@ -31,6 +27,44 @@ public sealed partial class PlanningAgent(ObjectiveGuard objectiveGuard)
 
     [GeneratedRegex(@"\b([1-5])\b")]
     private static partial Regex CountRegex();
+
+    [GeneratedRegex(@"\b(one|two|three|four|five)\b", RegexOptions.IgnoreCase)]
+    private static partial Regex WordCountRegex();
+
+    [GeneratedRegex(@"\b(job|role|position|opportunity|match|recommendation)\b", RegexOptions.IgnoreCase)]
+    private static partial Regex SingularResultRegex();
+
+    [GeneratedRegex(@"\b(jobs|roles|positions|opportunities|matches|recommendations|postings)\b", RegexOptions.IgnoreCase)]
+    private static partial Regex PluralResultRegex();
+
+    private static int ResolveDesiredCount(string objective)
+    {
+        var numericCount = CountRegex().Match(objective);
+        if (numericCount.Success &&
+            int.TryParse(numericCount.Groups[1].Value, out var parsedCount))
+        {
+            return Math.Clamp(parsedCount, 1, 5);
+        }
+
+        var wordCount = WordCountRegex().Match(objective);
+        if (wordCount.Success)
+        {
+            return wordCount.Groups[1].Value.ToLowerInvariant() switch
+            {
+                "one" => 1,
+                "two" => 2,
+                "three" => 3,
+                "four" => 4,
+                "five" => 5,
+                _ => 3
+            };
+        }
+
+        return SingularResultRegex().IsMatch(objective) &&
+            !PluralResultRegex().IsMatch(objective)
+                ? 1
+                : 3;
+    }
 }
 
 public sealed class CandidateProfileAgent
