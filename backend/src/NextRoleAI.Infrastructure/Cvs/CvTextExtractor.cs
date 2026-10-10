@@ -1,6 +1,7 @@
 using DocumentFormat.OpenXml.Packaging;
 using NextRoleAI.Application.Cvs;
 using UglyToad.PdfPig;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
 namespace NextRoleAI.Infrastructure.Cvs;
 
@@ -31,7 +32,7 @@ internal sealed class CvTextExtractor : ICvTextExtractor
         foreach (var page in document.GetPages())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            pages.Add(page.Text);
+            pages.Add(ContentOrderTextExtractor.GetText(page));
         }
 
         return string.Join(Environment.NewLine, pages);
