@@ -103,6 +103,26 @@ export interface JobPayload {
 
 export type CvProcessingStatus = 'NeedsReview' | 'Confirmed' | 'Failed';
 
+export interface CvEducationItem {
+  qualification: string;
+  fieldOfStudy: string;
+  institution: string;
+  status: string;
+  evidence: string;
+  confidence: number;
+}
+
+export interface CvQualityAssessment {
+  overallScore: number;
+  completenessScore: number;
+  clarityScore: number;
+  skillsEvidenceScore: number;
+  impactScore: number;
+  atsReadabilityScore: number;
+  strengths: string[];
+  improvements: string[];
+}
+
 export interface CvProfile {
   id: string;
   originalFileName: string;
@@ -118,6 +138,12 @@ export interface CvProfile {
   professionalSummary: string;
   yearsExperience: number;
   skills: string[];
+  education: CvEducationItem[];
+  qualityAssessment: CvQualityAssessment | null;
+  analysisMethod: string;
+  analysisModel: string | null;
+  analysisPromptVersion: string;
+  analyzedAtUtc: string | null;
   failureReason: string | null;
   createdAtUtc: string;
   updatedAtUtc: string;
