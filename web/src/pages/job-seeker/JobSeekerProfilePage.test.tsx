@@ -30,13 +30,21 @@ describe('JobSeekerProfilePage', () => {
   afterEach(cleanup);
 
   beforeEach(() => {
-    vi.mocked(useSWR).mockReturnValue({
-      data: profile,
+    vi.mocked(useSWR).mockImplementation((key) => ({
+      data: key === '/api/cv' ? undefined : profile,
       error: undefined,
       isLoading: false,
       mutate: vi.fn(),
-    } as never);
+    } as never));
     vi.mocked(api.request).mockResolvedValue(profile);
+  });
+
+  it('combines CV management and job preferences in one profile workspace', () => {
+    render(<MemoryRouter><JobSeekerProfilePage /></MemoryRouter>);
+
+    expect(screen.getByRole('heading', { name: 'Your professional evidence' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Upload CV' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Tell NextRoleAI what you want next.' })).toBeInTheDocument();
   });
 
   it('saves preferred salary and redirects to recommendations', async () => {

@@ -14,7 +14,7 @@ export function RecommendationsPage() {
 
   if (isLoading) return <LoadingState label="Ranking published jobs" />;
   if (error instanceof ApiError && error.status === 409) {
-    return <EmptyState title="Confirm your CV first" message={error.message} action={<Link className="button" to="/job-seeker/cv">Review my CV</Link>} />;
+    return <EmptyState title="Confirm your CV first" message={error.message} action={<Link className="button" to="/job-seeker/profile">Review my profile</Link>} />;
   }
   if (error) return <ErrorState message={error instanceof ApiError ? error.message : 'AI recommendations could not be calculated.'} />;
 

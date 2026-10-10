@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router';
+import { Navigate, Route, Routes } from 'react-router';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { AppLayout } from './layouts/AppLayout';
 import { PortalLayout } from './layouts/PortalLayout';
@@ -6,7 +6,6 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { JobSeekerDashboardPage } from './pages/job-seeker/JobSeekerDashboardPage';
 import { JobSeekerProfilePage } from './pages/job-seeker/JobSeekerProfilePage';
-import { CvPage } from './pages/job-seeker/CvPage';
 import { RecommendationsPage } from './pages/job-seeker/RecommendationsPage';
 import { AgentWorkflowsPage } from './pages/job-seeker/AgentWorkflowsPage';
 import { ApplicationsPage } from './pages/job-seeker/ApplicationsPage';
@@ -39,7 +38,7 @@ export function Application() {
           <Route path="job-seeker" element={<PortalLayout role="JobSeeker" />}>
             <Route index element={<JobSeekerDashboardPage />} />
             <Route path="profile" element={<JobSeekerProfilePage />} />
-            <Route path="cv" element={<CvPage />} />
+            <Route path="cv" element={<Navigate replace to="/job-seeker/profile" />} />
             <Route path="recommendations" element={<RecommendationsPage />} />
             <Route path="agent-workflows" element={<AgentWorkflowsPage />} />
             <Route path="applications" element={<ApplicationsPage />} />

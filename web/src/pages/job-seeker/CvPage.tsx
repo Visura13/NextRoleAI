@@ -114,7 +114,7 @@ function AnalysisSummary({ profile }: { profile: CvProfile }) {
   );
 }
 
-export function CvPage() {
+export function CvWorkspace({ embedded = false }: { embedded?: boolean }) {
   const navigate = useNavigate();
   const { data, error, isLoading, mutate } = useSWR<CvProfile>('/api/cv', swrFetcher, { shouldRetryOnError: false });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -223,8 +223,12 @@ export function CvPage() {
   if (error && !(error instanceof ApiError && error.status === 404)) return <ErrorState message="Your CV could not be loaded." />;
 
   return (
-    <div className="page-stack">
-      <header className="portal-header"><p className="eyebrow">CV intelligence</p><h1>Turn your CV into a profile you control.</h1><p>Upload a PDF or DOCX, then review the extracted information before it can influence recommendations.</p></header>
+    <section className={embedded ? 'profile-workspace-section' : 'page-stack'}>
+      {embedded ? (
+        <div className="section-heading"><p className="eyebrow">CV intelligence</p><h2>Your professional evidence</h2><p>Upload a PDF or DOCX, review the AI-extracted details, education, and quality feedback, then confirm what recommendations may use.</p></div>
+      ) : (
+        <header className="portal-header"><p className="eyebrow">CV intelligence</p><h1>Turn your CV into a profile you control.</h1><p>Upload a PDF or DOCX, then review the extracted information before it can influence recommendations.</p></header>
+      )}
       {feedback && <Notice kind={feedback.kind}>{feedback.message}</Notice>}
       <form className="surface-form upload-panel" onSubmit={upload}>
         <div><h2>{data ? 'Replace CV' : 'Upload CV'}</h2><p className="muted">PDF or DOCX, maximum 5 MB. The original document is stored privately.</p></div>
@@ -260,6 +264,10 @@ export function CvPage() {
           <div className="form-actions"><button className="button" disabled={saving} type="submit">{saving ? 'Confirming…' : data.status === 'Confirmed' ? 'Save corrections' : 'Confirm CV profile'}</button></div>
         </form>
       )}
-    </div>
+    </section>
   );
+}
+
+export function CvPage() {
+  return <CvWorkspace />;
 }
