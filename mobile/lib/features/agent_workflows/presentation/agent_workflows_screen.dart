@@ -135,9 +135,7 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
           ],
           if (model.selected case final workflow?) ...[
             const SizedBox(height: 18),
-            _WorkflowDetails(
-              workflow: workflow,
-            ),
+            _WorkflowDetails(workflow: workflow),
           ] else if (!model.isLoading) ...[
             const SizedBox(height: 30),
             const Center(child: Text('No workflow history yet.')),
