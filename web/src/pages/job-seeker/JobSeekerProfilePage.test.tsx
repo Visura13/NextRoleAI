@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router';
 import useSWR from 'swr';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { api } from '../../api/client';
-import type { JobSeekerProfile } from '../../api/types';
+import type { CvProfile, JobSeekerProfile } from '../../api/types';
 import { JobSeekerProfilePage } from './JobSeekerProfilePage';
 
 vi.mock('swr', () => ({ default: vi.fn() }));
@@ -26,12 +26,38 @@ const profile: JobSeekerProfile = {
   updatedAtUtc: '2030-01-01T00:00:00Z',
 };
 
+const confirmedCv: CvProfile = {
+  id: 'cv-1',
+  originalFileName: 'candidate.pdf',
+  contentType: 'application/pdf',
+  sizeBytes: 2048,
+  sha256Checksum: '1234567890abcdef',
+  status: 'Confirmed',
+  candidateName: 'Alex Morgan',
+  email: 'alex@example.com',
+  phone: '',
+  location: 'Colombo',
+  currentJobTitle: 'Frontend engineer',
+  professionalSummary: 'Builds accessible React applications.',
+  yearsExperience: 2,
+  skills: ['React', 'TypeScript'],
+  education: [],
+  qualityAssessment: null,
+  analysisMethod: 'ai',
+  analysisModel: 'test-model',
+  analysisPromptVersion: 'cv-analysis-v1',
+  analyzedAtUtc: '2030-01-01T00:00:00Z',
+  failureReason: null,
+  createdAtUtc: '2030-01-01T00:00:00Z',
+  updatedAtUtc: '2030-01-01T00:00:00Z',
+};
+
 describe('JobSeekerProfilePage', () => {
   afterEach(cleanup);
 
   beforeEach(() => {
     vi.mocked(useSWR).mockImplementation((key) => ({
-      data: key === '/api/cv' ? undefined : profile,
+      data: key === '/api/cv' ? confirmedCv : profile,
       error: undefined,
       isLoading: false,
       mutate: vi.fn(),
@@ -43,8 +69,9 @@ describe('JobSeekerProfilePage', () => {
     render(<MemoryRouter><JobSeekerProfilePage /></MemoryRouter>);
 
     expect(screen.getByRole('heading', { name: 'Your professional evidence' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Upload CV' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Tell NextRoleAI what you want next.' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Professional headline')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Skills')).not.toBeInTheDocument();
   });
 
   it('saves preferred salary and redirects to recommendations', async () => {
@@ -59,12 +86,21 @@ describe('JobSeekerProfilePage', () => {
     );
 
     expect(screen.getByLabelText(/Preferred minimum monthly salary/)).toHaveValue(200000);
-    await user.click(screen.getByRole('button', { name: 'Save profile' }));
+    await user.click(screen.getByRole('button', { name: 'Save preferences and view recommendations' }));
 
     expect(await screen.findByRole('heading', { name: 'Recommendations destination' })).toBeInTheDocument();
     expect(api.request).toHaveBeenCalledWith(
       '/api/profiles/job-seeker',
-      expect.objectContaining({ body: expect.stringContaining('"preferredSalary":200000') }),
+      expect.objectContaining({
+        body: expect.stringContaining('"preferredSalary":200000'),
+      }),
+      true,
+    );
+    expect(api.request).toHaveBeenCalledWith(
+      '/api/profiles/job-seeker',
+      expect.objectContaining({
+        body: expect.stringContaining('"skills":["React","TypeScript"]'),
+      }),
       true,
     );
   });
