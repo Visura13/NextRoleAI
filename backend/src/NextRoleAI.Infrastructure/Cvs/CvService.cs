@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using NextRoleAI.Application.Cvs;
 using NextRoleAI.Domain.Cvs;
@@ -10,11 +11,13 @@ internal sealed class CvService(
     ApplicationDbContext dbContext,
     ICvFileStore fileStore,
     ICvTextExtractor textExtractor,
-    ICvProfileParser profileParser,
+    ICvAnalyzer cvAnalyzer,
     TimeProvider timeProvider) : ICvService
 {
     private const long MaximumFileBytes = 5 * 1024 * 1024;
     private const int MaximumExtractedTextLength = 50_000;
+
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private static readonly IReadOnlyDictionary<string, string> SupportedTypes =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -83,7 +86,8 @@ internal sealed class CvService(
             extractedText = extractedText[..MaximumExtractedTextLength];
         }
 
-        var parsed = profileParser.Parse(extractedText);
+        var analysis = await cvAnalyzer.AnalyzeAsync(extractedText, cancellationToken);
+        var parsed = analysis.Profile;
         var bytes = buffer.ToArray();
         var checksum = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
         var storageKey = $"{Guid.NewGuid():N}{extension}";
@@ -122,6 +126,19 @@ internal sealed class CvService(
         cv.CurrentJobTitle = LimitLength(parsed.CurrentJobTitle, 150);
         cv.ProfessionalSummary = LimitLength(parsed.ProfessionalSummary, 2000);
         cv.YearsExperience = parsed.YearsExperience;
+        cv.EducationJson = JsonSerializer.Serialize(
+            CleanEducation(parsed.Education ?? []),
+            JsonOptions);
+        cv.QualityScore = analysis.QualityAssessment?.OverallScore;
+        cv.QualityAssessmentJson = analysis.QualityAssessment is null
+            ? null
+            : JsonSerializer.Serialize(analysis.QualityAssessment, JsonOptions);
+        cv.AnalysisMethod = LimitLength(analysis.AnalysisMethod, 50);
+        cv.AnalysisModel = string.IsNullOrWhiteSpace(analysis.Model)
+            ? null
+            : LimitLength(analysis.Model, 100);
+        cv.AnalysisPromptVersion = LimitLength(analysis.PromptVersion, 50);
+        cv.AnalyzedAtUtc = analysis.AnalyzedAtUtc;
         cv.FailureReason = null;
         cv.UpdatedAtUtc = now;
         AddSkills(cv, parsed.Skills);
@@ -174,6 +191,9 @@ internal sealed class CvService(
         cv.CurrentJobTitle = update.CurrentJobTitle.Trim();
         cv.ProfessionalSummary = update.ProfessionalSummary.Trim();
         cv.YearsExperience = update.YearsExperience;
+        cv.EducationJson = JsonSerializer.Serialize(
+            CleanEducation(update.Education),
+            JsonOptions);
         cv.Status = CvProcessingStatus.Confirmed;
         cv.FailureReason = null;
         cv.UpdatedAtUtc = timeProvider.GetUtcNow();
@@ -280,6 +300,55 @@ internal sealed class CvService(
             : trimmed[..maximumLength].TrimEnd();
     }
 
+    private static IReadOnlyCollection<CvEducationItem> CleanEducation(
+        IEnumerable<CvEducationItem> education) =>
+        education
+            .Select(item => new CvEducationItem(
+                LimitLength(item.Qualification, 150),
+                LimitLength(item.FieldOfStudy, 200),
+                LimitLength(item.Institution, 200),
+                LimitLength(item.Status, 50),
+                LimitLength(item.Evidence, 500),
+                Math.Clamp(item.Confidence, 0m, 1m)))
+            .Where(item => CvEducationPolicy.IsSupported(
+                item.Qualification,
+                item.FieldOfStudy,
+                item.Institution))
+            .DistinctBy(
+                item => $"{item.Qualification}|{item.Institution}",
+                StringComparer.OrdinalIgnoreCase)
+            .Take(20)
+            .ToArray();
+
+    private static IReadOnlyCollection<CvEducationItem> ReadEducation(string json)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<CvEducationItem[]>(json, JsonOptions) ?? [];
+        }
+        catch (JsonException)
+        {
+            return [];
+        }
+    }
+
+    private static CvQualityAssessment? ReadQualityAssessment(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<CvQualityAssessment>(json, JsonOptions);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
     private static CvResult ToResult(CvDocument cv) =>
         new(
             cv.Id,
@@ -299,6 +368,12 @@ internal sealed class CvService(
                 .OrderBy(skill => skill.Name, StringComparer.OrdinalIgnoreCase)
                 .Select(skill => skill.Name)
                 .ToArray(),
+            ReadEducation(cv.EducationJson),
+            ReadQualityAssessment(cv.QualityAssessmentJson),
+            cv.AnalysisMethod,
+            cv.AnalysisModel,
+            cv.AnalysisPromptVersion,
+            cv.AnalyzedAtUtc,
             cv.FailureReason,
             cv.CreatedAtUtc,
             cv.UpdatedAtUtc);

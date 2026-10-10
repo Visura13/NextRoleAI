@@ -16,7 +16,8 @@ public sealed record CvProfileUpdate(
     string CurrentJobTitle,
     string ProfessionalSummary,
     int YearsExperience,
-    IReadOnlyCollection<string> Skills);
+    IReadOnlyCollection<string> Skills,
+    IReadOnlyCollection<CvEducationItem> Education);
 
 public sealed record CvResult(
     Guid Id,
@@ -33,6 +34,12 @@ public sealed record CvResult(
     string ProfessionalSummary,
     int YearsExperience,
     IReadOnlyCollection<string> Skills,
+    IReadOnlyCollection<CvEducationItem> Education,
+    CvQualityAssessment? QualityAssessment,
+    string AnalysisMethod,
+    string? AnalysisModel,
+    string AnalysisPromptVersion,
+    DateTimeOffset? AnalyzedAtUtc,
     string? FailureReason,
     DateTimeOffset CreatedAtUtc,
     DateTimeOffset UpdatedAtUtc);
@@ -66,4 +73,31 @@ public sealed record ExtractedCvProfile(
     string CurrentJobTitle,
     string ProfessionalSummary,
     int YearsExperience,
-    IReadOnlyCollection<string> Skills);
+    IReadOnlyCollection<string> Skills,
+    IReadOnlyCollection<CvEducationItem>? Education = null);
+
+public sealed record CvEducationItem(
+    string Qualification,
+    string FieldOfStudy,
+    string Institution,
+    string Status,
+    string Evidence,
+    decimal Confidence);
+
+public sealed record CvQualityAssessment(
+    int OverallScore,
+    int CompletenessScore,
+    int ClarityScore,
+    int SkillsEvidenceScore,
+    int ImpactScore,
+    int AtsReadabilityScore,
+    IReadOnlyCollection<string> Strengths,
+    IReadOnlyCollection<string> Improvements);
+
+public sealed record CvAnalysis(
+    ExtractedCvProfile Profile,
+    CvQualityAssessment? QualityAssessment,
+    string AnalysisMethod,
+    string? Model,
+    string PromptVersion,
+    DateTimeOffset AnalyzedAtUtc);
