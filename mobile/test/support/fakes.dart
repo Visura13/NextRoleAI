@@ -192,11 +192,12 @@ JobRecommendation sampleRecommendation() => JobRecommendation(
   job: sampleJob(),
   score: 92.5,
   breakdown: const MatchBreakdown(
-    skillsFit: 38,
+    skillsFit: 34,
     roleFit: 24.5,
     experienceFit: 12,
     educationFit: 8,
     locationFit: 10,
+    salaryFit: 4,
   ),
   matchedSkills: const ['Flutter'],
   missingRequiredSkills: const [],

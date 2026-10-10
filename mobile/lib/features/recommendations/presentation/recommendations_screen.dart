@@ -97,33 +97,20 @@ class _RecommendationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 66,
-                height: 66,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppTheme.lime,
-                  border: Border.all(color: AppTheme.forest, width: 3),
-                ),
-                child: Center(
-                  child: Text(
-                    recommendation.score.toStringAsFixed(1),
-                    style: const TextStyle(fontWeight: FontWeight.w900),
-                  ),
-                ),
+          Container(
+            width: 66,
+            height: 66,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppTheme.lime,
+              border: Border.all(color: AppTheme.forest, width: 3),
+            ),
+            child: Center(
+              child: Text(
+                recommendation.score.toStringAsFixed(1),
+                style: const TextStyle(fontWeight: FontWeight.w900),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '${recommendation.algorithmVersion} · AI score',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 14),
           JobCard(
@@ -176,11 +163,12 @@ class _Breakdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     children: [
-      _row('Skills fit', breakdown.skillsFit, 40),
+      _row('Skills fit', breakdown.skillsFit, 35),
       _row('Role fit', breakdown.roleFit, 25),
       _row('Experience fit', breakdown.experienceFit, 15),
       _row('Education fit', breakdown.educationFit, 10),
       _row('Location fit', breakdown.locationFit, 10),
+      _row('Salary fit', breakdown.salaryFit, 5),
     ],
   );
 

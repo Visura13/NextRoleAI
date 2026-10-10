@@ -13,6 +13,7 @@ void main() {
       summary: 'Builds reliable products.',
       location: 'Colombo',
       preferredJobTitle: 'Flutter Engineer',
+      preferredSalary: 250000,
       yearsOfExperience: 3,
       skills: ['Flutter', 'Dart'],
     );
@@ -21,6 +22,7 @@ void main() {
 
     expect(succeeded, isTrue);
     expect(repository.profile?.skills, ['Flutter', 'Dart']);
+    expect(repository.profile?.preferredSalary, 250000);
     expect(viewModel.successMessage, contains('saved'));
   });
 }

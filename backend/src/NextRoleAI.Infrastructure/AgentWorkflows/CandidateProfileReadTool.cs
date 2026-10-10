@@ -37,6 +37,7 @@ internal sealed class CandidateProfileReadTool(ApplicationDbContext dbContext) :
             string.IsNullOrWhiteSpace(profile?.Location)
                 ? cv?.Location ?? string.Empty
                 : profile.Location,
+            profile?.PreferredSalary,
             Math.Max(cv?.YearsExperience ?? 0, profile?.YearsOfExperience ?? 0),
             (cv?.Skills.Select(skill => skill.Name) ?? [])
                 .Concat(profile?.Skills.Select(skill => skill.Name) ?? [])

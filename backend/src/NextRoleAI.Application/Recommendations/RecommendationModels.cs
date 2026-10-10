@@ -7,6 +7,7 @@ public sealed record CandidateMatchProfile(
     string CurrentJobTitle,
     string PreferredJobTitle,
     string PreferredLocation,
+    decimal? PreferredSalary,
     string ProfessionalSummary,
     int YearsExperience,
     IReadOnlyCollection<string> Skills,
@@ -17,10 +18,11 @@ public sealed record MatchBreakdown(
     decimal RoleFit,
     decimal ExperienceFit,
     decimal EducationFit,
-    decimal LocationFit)
+    decimal LocationFit,
+    decimal SalaryFit)
 {
     public decimal Total =>
-        SkillsFit + RoleFit + ExperienceFit + EducationFit + LocationFit;
+        SkillsFit + RoleFit + ExperienceFit + EducationFit + LocationFit + SalaryFit;
 }
 
 public sealed record AiJobMatchScore(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/widgets/states.dart';
@@ -18,6 +19,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _preferredTitle = TextEditingController();
   final _summary = TextEditingController();
   final _location = TextEditingController();
+  final _preferredSalary = TextEditingController();
   final _experience = TextEditingController(text: '0');
   final _skills = TextEditingController();
   bool _didPopulate = false;
@@ -42,6 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _preferredTitle.text = profile.preferredJobTitle;
     _summary.text = profile.summary;
     _location.text = profile.location;
+    _preferredSalary.text = profile.preferredSalary?.toString() ?? '';
     _experience.text = '${profile.yearsOfExperience}';
     _skills.text = profile.skills.join(', ');
     _didPopulate = true;
@@ -54,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _preferredTitle.dispose();
     _summary.dispose();
     _location.dispose();
+    _preferredSalary.dispose();
     _experience.dispose();
     _skills.dispose();
     super.dispose();
@@ -68,16 +72,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .where((skill) => skill.isNotEmpty)
         .toSet()
         .toList(growable: false);
-    await context.read<ProfileViewModel>().save(
+    final succeeded = await context.read<ProfileViewModel>().save(
       JobSeekerProfile(
         headline: _headline.text.trim(),
         preferredJobTitle: _preferredTitle.text.trim(),
         summary: _summary.text.trim(),
         location: _location.text.trim(),
+        preferredSalary: _preferredSalary.text.trim().isEmpty
+            ? null
+            : num.parse(_preferredSalary.text.trim()),
         yearsOfExperience: int.parse(_experience.text),
         skills: skills,
       ),
     );
+    if (succeeded && mounted) context.go('/recommendations');
   }
 
   @override
@@ -134,6 +142,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _requiredField(_preferredTitle, 'Preferred job title'),
             const SizedBox(height: 14),
             _requiredField(_location, 'Preferred location'),
+            const SizedBox(height: 14),
+            TextFormField(
+              controller: _preferredSalary,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Preferred minimum monthly salary (LKR)',
+                helperText: 'Optional; used when a job lists comparable pay',
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) return null;
+                final salary = num.tryParse(value.trim());
+                if (salary == null || salary < 1 || salary > 1000000000) {
+                  return 'Enter an amount from LKR 1 to LKR 1,000,000,000.';
+                }
+                return null;
+              },
+            ),
             const SizedBox(height: 14),
             TextFormField(
               controller: _experience,

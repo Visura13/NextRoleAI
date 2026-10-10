@@ -14,6 +14,8 @@ public sealed class JobSeekerProfile
 
     public string PreferredJobTitle { get; set; } = string.Empty;
 
+    public decimal? PreferredSalary { get; set; }
+
     public int YearsOfExperience { get; set; }
 
     public DateTimeOffset CreatedAtUtc { get; set; }

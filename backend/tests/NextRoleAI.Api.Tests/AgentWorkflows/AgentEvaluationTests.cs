@@ -50,6 +50,7 @@ public sealed class AgentEvaluationTests
             "Software Engineer",
             "Software Engineer",
             "Colombo",
+            200_000m,
             3,
             ["C#", "PostgreSQL"]);
         var shortlist = new[]
@@ -96,6 +97,7 @@ public sealed class AgentEvaluationTests
             "Software Engineer",
             "Software Engineer",
             "Colombo",
+            null,
             3,
             ["C#"]);
         var shortlist = new[]

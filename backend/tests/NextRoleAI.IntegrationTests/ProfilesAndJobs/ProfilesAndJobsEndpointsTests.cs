@@ -34,6 +34,7 @@ public sealed class ProfilesAndJobsEndpointsTests(NextRoleAIApiFactory factory)
                 "Builds reliable APIs.",
                 "Colombo",
                 "Software Engineer",
+                200_000m,
                 2,
                 ["C#", "PostgreSQL", "c#"]));
 
@@ -45,6 +46,7 @@ public sealed class ProfilesAndJobsEndpointsTests(NextRoleAIApiFactory factory)
 
         Assert.NotNull(profile);
         Assert.Equal("Backend Developer", profile.Headline);
+        Assert.Equal(200_000m, profile.PreferredSalary);
         Assert.Equal(2, profile.Skills.Count);
         Assert.Contains("C#", profile.Skills);
         Assert.Contains("PostgreSQL", profile.Skills);
@@ -56,6 +58,7 @@ public sealed class ProfilesAndJobsEndpointsTests(NextRoleAIApiFactory factory)
                 "Builds reliable APIs and distributed systems.",
                 "Kandy",
                 "Senior Software Engineer",
+                350_000m,
                 4,
                 ["ASP.NET Core", "Docker"]));
         Assert.Equal(HttpStatusCode.OK, replacementResponse.StatusCode);
@@ -63,6 +66,7 @@ public sealed class ProfilesAndJobsEndpointsTests(NextRoleAIApiFactory factory)
         var replacement = await replacementResponse.Content
             .ReadFromJsonAsync<JobSeekerProfileResult>(JsonOptions);
         Assert.NotNull(replacement);
+        Assert.Equal(350_000m, replacement.PreferredSalary);
         Assert.Equal(2, replacement.Skills.Count);
         Assert.DoesNotContain("C#", replacement.Skills);
         Assert.Contains("Docker", replacement.Skills);

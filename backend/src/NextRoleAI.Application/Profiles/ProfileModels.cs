@@ -5,6 +5,7 @@ public sealed record JobSeekerProfileUpdate(
     string Summary,
     string Location,
     string PreferredJobTitle,
+    decimal? PreferredSalary,
     int YearsOfExperience,
     IReadOnlyCollection<string> Skills);
 
@@ -14,6 +15,7 @@ public sealed record JobSeekerProfileResult(
     string Summary,
     string Location,
     string PreferredJobTitle,
+    decimal? PreferredSalary,
     int YearsOfExperience,
     IReadOnlyCollection<string> Skills,
     DateTimeOffset UpdatedAtUtc);

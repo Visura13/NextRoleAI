@@ -49,6 +49,7 @@ internal sealed class RecommendationService(
             cv.CurrentJobTitle,
             profile?.PreferredJobTitle ?? string.Empty,
             string.IsNullOrWhiteSpace(profile?.Location) ? cv.Location : profile.Location,
+            profile?.PreferredSalary,
             string.Join(
                 " ",
                 new[] { cv.ProfessionalSummary, profile?.Summary }
@@ -102,7 +103,7 @@ internal sealed class RecommendationService(
                 .ThenBy(result => result.Job.Title, StringComparer.OrdinalIgnoreCase)
                 .ToArray();
 
-            cache.Set(cacheKey, rankedRecommendations, TimeSpan.FromMinutes(10));
+            cache.Set(cacheKey, rankedRecommendations, TimeSpan.FromHours(12));
         }
 
         return RecommendationListResult.Success(rankedRecommendations.Take(limit).ToArray());

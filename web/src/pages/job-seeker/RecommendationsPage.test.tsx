@@ -47,11 +47,12 @@ const response: RecommendationResponse = {
     job: reactJob,
     score: 93,
     breakdown: {
-      skillsFit: 38,
+      skillsFit: 34,
       roleFit: 24,
       experienceFit: 12,
       educationFit: 9,
       locationFit: 10,
+      salaryFit: 4,
       total: 93,
     },
     matchedSkills: ['React', 'TypeScript'],
@@ -81,11 +82,12 @@ describe('RecommendationsPage', () => {
     expect(screen.getByRole('heading', { name: 'Jobs ranked against your complete professional profile.' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'React Frontend Engineer' })).toBeInTheDocument();
     expect(screen.getByText('93.0')).toBeInTheDocument();
-    expect(screen.getByText(/ai-semantic-ranking-v1:test-model/)).toBeInTheDocument();
+    expect(screen.queryByText(/Algorithm version:/)).not.toBeInTheDocument();
     const breakdown = screen.getByLabelText('Score breakdown');
-    expect(breakdown).toHaveTextContent('Skills fit 38/40');
+    expect(breakdown).toHaveTextContent('Skills fit 34/35');
     expect(breakdown).toHaveTextContent('Role fit 24/25');
     expect(breakdown).toHaveTextContent('Education fit 9/10');
+    expect(breakdown).toHaveTextContent('Salary fit 4/5');
     expect(screen.getByText('React and TypeScript directly support the frontend responsibilities.')).toBeInTheDocument();
   });
 });

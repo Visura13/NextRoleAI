@@ -48,6 +48,7 @@ public sealed class ProfilesController(IProfileService profileService) : Control
                 request.Summary,
                 request.Location,
                 request.PreferredJobTitle,
+                request.PreferredSalary,
                 request.YearsOfExperience,
                 request.Skills),
             cancellationToken);

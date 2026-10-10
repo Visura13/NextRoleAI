@@ -7,6 +7,7 @@ class MatchBreakdown {
     required this.experienceFit,
     required this.educationFit,
     required this.locationFit,
+    required this.salaryFit,
   });
 
   final num skillsFit;
@@ -14,6 +15,7 @@ class MatchBreakdown {
   final num experienceFit;
   final num educationFit;
   final num locationFit;
+  final num salaryFit;
 
   factory MatchBreakdown.fromJson(Map<String, dynamic> json) => MatchBreakdown(
     skillsFit: json['skillsFit'] as num,
@@ -21,6 +23,7 @@ class MatchBreakdown {
     experienceFit: json['experienceFit'] as num,
     educationFit: json['educationFit'] as num,
     locationFit: json['locationFit'] as num,
+    salaryFit: json['salaryFit'] as num,
   );
 }
 
