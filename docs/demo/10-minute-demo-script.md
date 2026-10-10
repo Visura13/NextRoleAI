@@ -14,9 +14,9 @@ Log in as each role in React. Show protected navigation. Briefly demonstrate tha
 
 Create, edit, and publish a job with required/optional skills. Show search/filter/sort/pagination briefly. Open Swagger and point to REST routes, request validation, and the health URL. Explain the company ownership constraint and migration-backed schema.
 
-## 3:30-5:00 — CV and deterministic ranking
+## 3:30-5:00 — CV analysis and AI semantic ranking
 
-As Job Seeker, upload the prepared non-sensitive CV, review/correct extracted fields, and confirm them. Show ranked jobs, score breakdown, reasons, and missing skills. Explain that unconfirmed extraction cannot influence ranking and files are private.
+As Job Seeker, upload the prepared non-sensitive CV, review/correct extracted fields and higher education, inspect the CV quality feedback, and confirm the profile. Show the React Frontend Engineer ranked against the complete profile, its semantic score breakdown, reasons, and missing skills. Explain that unconfirmed extraction cannot influence ranking, files are private, model output is validated, and provider failure returns a visible error rather than a fake fallback score.
 
 ## 5:00-7:00 — Agentic workflow
 

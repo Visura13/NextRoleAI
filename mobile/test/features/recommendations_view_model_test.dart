@@ -13,7 +13,10 @@ void main() {
     await viewModel.load();
 
     expect(viewModel.items.single.score, 92.5);
-    expect(viewModel.items.single.algorithmVersion, 'deterministic-v1');
+    expect(
+      viewModel.items.single.algorithmVersion,
+      'ai-semantic-ranking-v1:test-model',
+    );
     expect(viewModel.errorMessage, isNull);
   });
 

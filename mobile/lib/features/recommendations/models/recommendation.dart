@@ -2,25 +2,25 @@ import '../../jobs/models/job_models.dart';
 
 class MatchBreakdown {
   const MatchBreakdown({
-    required this.requiredSkills,
-    required this.preferredSkills,
-    required this.title,
-    required this.experience,
-    required this.location,
+    required this.skillsFit,
+    required this.roleFit,
+    required this.experienceFit,
+    required this.educationFit,
+    required this.locationFit,
   });
 
-  final num requiredSkills;
-  final num preferredSkills;
-  final num title;
-  final num experience;
-  final num location;
+  final num skillsFit;
+  final num roleFit;
+  final num experienceFit;
+  final num educationFit;
+  final num locationFit;
 
   factory MatchBreakdown.fromJson(Map<String, dynamic> json) => MatchBreakdown(
-    requiredSkills: json['requiredSkills'] as num,
-    preferredSkills: json['preferredSkills'] as num,
-    title: json['title'] as num,
-    experience: json['experience'] as num,
-    location: json['location'] as num,
+    skillsFit: json['skillsFit'] as num,
+    roleFit: json['roleFit'] as num,
+    experienceFit: json['experienceFit'] as num,
+    educationFit: json['educationFit'] as num,
+    locationFit: json['locationFit'] as num,
   );
 }
 

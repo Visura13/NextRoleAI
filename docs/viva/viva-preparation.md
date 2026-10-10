@@ -20,7 +20,7 @@ Use these prompts to practise explaining and modifying your own implementation. 
 ## CV, ranking, and agents
 
 - Explain the upload size/type/signature checks and why stored names are generated.
-- Recalculate a sample deterministic score and interpret every explanation field.
+- Explain the five-part AI scoring rubric, how semantic matching differs from exact keywords, and how every response field is validated before display.
 - Name all four agents, each responsibility, and the exact tools each can use.
 - Explain why user text cannot create arbitrary tool calls.
 - Show structured input/output, validation rules, safe failure, retry, timeout, persisted history, and the approval gate.

@@ -1,6 +1,6 @@
 # ADR 0005: Private CV storage and deterministic ranking
 
-- Status: accepted
+- Status: partially superseded by ADR 0007 (private storage remains accepted)
 - Date: 2026-10-05
 
 ## Context

@@ -46,16 +46,16 @@ internal sealed class OpenAiCompatibleCvLanguageModelClient :
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException(
-                $"CV AI provider returned HTTP {(int)response.StatusCode}.");
+                $"AI provider returned HTTP {(int)response.StatusCode}.");
         }
 
         using var payload = await response.Content.ReadFromJsonAsync<JsonDocument>(
             cancellationToken: cancellationToken)
-            ?? throw new InvalidOperationException("CV AI provider returned an empty response.");
+            ?? throw new InvalidOperationException("AI provider returned an empty response.");
         var choices = payload.RootElement.GetProperty("choices");
         if (choices.GetArrayLength() == 0)
         {
-            throw new InvalidOperationException("CV AI provider returned no completion choices.");
+            throw new InvalidOperationException("AI provider returned no completion choices.");
         }
 
         var content = choices[0]
@@ -63,7 +63,7 @@ internal sealed class OpenAiCompatibleCvLanguageModelClient :
             .GetProperty("content")
             .GetString();
         return string.IsNullOrWhiteSpace(content)
-            ? throw new InvalidOperationException("CV AI provider returned empty JSON content.")
+            ? throw new InvalidOperationException("AI provider returned empty JSON content.")
             : content;
     }
 

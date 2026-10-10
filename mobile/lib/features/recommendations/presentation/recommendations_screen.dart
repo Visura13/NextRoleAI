@@ -61,13 +61,13 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 36),
                 children: [
                   Text(
-                    'Jobs ranked by evidence.',
+                    'Jobs ranked by AI semantic fit.',
                     style: Theme.of(context).textTheme.headlineSmall
                         ?.copyWith(fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Every point comes from confirmed skills, title, experience, or location.',
+                    'The AI compares transferable skills, responsibilities, experience, education, and work preferences.',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -117,7 +117,7 @@ class _RecommendationCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '${recommendation.algorithmVersion} · transparent score',
+                  '${recommendation.algorithmVersion} · AI score',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -176,11 +176,11 @@ class _Breakdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     children: [
-      _row('Required skills', breakdown.requiredSkills, 45),
-      _row('Preferred skills', breakdown.preferredSkills, 15),
-      _row('Title', breakdown.title, 15),
-      _row('Experience', breakdown.experience, 15),
-      _row('Location', breakdown.location, 10),
+      _row('Skills fit', breakdown.skillsFit, 40),
+      _row('Role fit', breakdown.roleFit, 25),
+      _row('Experience fit', breakdown.experienceFit, 15),
+      _row('Education fit', breakdown.educationFit, 10),
+      _row('Location fit', breakdown.locationFit, 10),
     ],
   );
 

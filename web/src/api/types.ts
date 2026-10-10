@@ -150,11 +150,11 @@ export interface CvProfile {
 }
 
 export interface MatchBreakdown {
-  requiredSkills: number;
-  preferredSkills: number;
-  title: number;
-  experience: number;
-  location: number;
+  skillsFit: number;
+  roleFit: number;
+  experienceFit: number;
+  educationFit: number;
+  locationFit: number;
   total: number;
 }
 

@@ -35,7 +35,7 @@ services:
       - key: CvStorage__RootPath
         value: /tmp/nextroleai-cvs
       - key: CvAi__Enabled
-        value: "false"
+        value: "true"
       - key: CvAi__BaseUrl
         value: https://api.openai.com/v1/
       - key: CvAi__ApiKey

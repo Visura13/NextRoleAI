@@ -58,7 +58,7 @@ Email delivery is disabled by default. For a live Resend demonstration, also con
 
 CV files default to the operating system's private application-data directory, outside this repository. To use another private development directory, optionally set `CvStorage__RootPath` to an absolute path. Do not point it at `web/`, `wwwroot/`, or another publicly served directory.
 
-AI-assisted CV analysis is disabled by default. To enable the provider-neutral OpenAI-compatible integration, set `CvAi__Enabled=true`, `CvAi__BaseUrl`, `CvAi__ApiKey`, and `CvAi__Model`. The API redacts locally detected names, email addresses, and phone numbers before sending CV text, validates evidence-backed skills, excludes school-level O/L and A/L education, and falls back to deterministic parsing if the provider is unavailable.
+Configure the provider-neutral OpenAI-compatible integration with `CvAi__Enabled=true`, `CvAi__BaseUrl`, `CvAi__ApiKey`, and `CvAi__Model`. The API redacts locally detected names, email addresses, and phone numbers before CV analysis, validates evidence-backed skills, excludes school-level O/L and A/L education, and falls back to basic extraction if CV analysis is unavailable. Job recommendations require this provider: the model evaluates semantic and transferable fit across skills, responsibilities, experience, education, and location; invalid or unavailable AI output produces `503` instead of a substituted keyword score.
 
 Optional local demo data is disabled by default. To create a demo Recruiter, company, and published job in the Development environment, also set:
 

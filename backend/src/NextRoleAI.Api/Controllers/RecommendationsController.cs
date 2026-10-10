@@ -17,6 +17,7 @@ public sealed class RecommendationsController(
     [HttpGet]
     [ProducesResponseType<RecommendationResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     public async Task<IActionResult> Get(
         [FromQuery, Range(1, 100)] int limit = 20,
         CancellationToken cancellationToken = default)
@@ -25,14 +26,22 @@ public sealed class RecommendationsController(
             GetUserId(),
             limit,
             cancellationToken);
-        return result.Succeeded
-            ? Ok(new RecommendationResponse(result.Items))
-            : Conflict(new ProblemDetails
-            {
-                Title = "Confirmed CV required",
-                Detail = result.Message,
-                Status = StatusCodes.Status409Conflict
-            });
+        if (result.Succeeded)
+        {
+            return Ok(new RecommendationResponse(result.Items));
+        }
+
+        var status = result.Error == RecommendationError.ConfirmedCvRequired
+            ? StatusCodes.Status409Conflict
+            : StatusCodes.Status503ServiceUnavailable;
+        return StatusCode(status, new ProblemDetails
+        {
+            Title = result.Error == RecommendationError.ConfirmedCvRequired
+                ? "Confirmed CV required"
+                : "AI ranking unavailable",
+            Detail = result.Message,
+            Status = status
+        });
     }
 
     private string GetUserId() =>

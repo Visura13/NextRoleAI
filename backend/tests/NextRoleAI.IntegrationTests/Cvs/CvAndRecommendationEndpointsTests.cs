@@ -131,7 +131,7 @@ public sealed class CvAndRecommendationEndpointsTests(NextRoleAIApiFactory facto
             recommendations.Items,
             item => item.Job.Id == job.Id);
         Assert.Equal(100m, recommendation.Score);
-        Assert.Equal("deterministic-v1", recommendation.AlgorithmVersion);
+        Assert.Equal("ai-semantic-ranking-v1:test-model", recommendation.AlgorithmVersion);
         Assert.Empty(recommendation.MissingRequiredSkills);
 
         var startWorkflowResponse = await seekerClient.PostAsJsonAsync(

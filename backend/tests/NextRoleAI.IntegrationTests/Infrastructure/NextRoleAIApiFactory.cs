@@ -1,4 +1,9 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using NextRoleAI.Application.Jobs;
+using NextRoleAI.Application.Recommendations;
 
 namespace NextRoleAI.IntegrationTests.Infrastructure;
 
@@ -31,6 +36,15 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
         SetEnvironmentVariable("Notifications__FromAddress", null);
     }
 
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureServices(services =>
+        {
+            services.RemoveAll<IAiJobRecommendationRanker>();
+            services.AddSingleton<IAiJobRecommendationRanker, TestAiJobRecommendationRanker>();
+        });
+    }
+
     protected override void Dispose(bool disposing)
     {
         try
@@ -55,5 +69,44 @@ public sealed class NextRoleAIApiFactory : WebApplicationFactory<Program>
     {
         originalEnvironment[name] = Environment.GetEnvironmentVariable(name);
         Environment.SetEnvironmentVariable(name, value);
+    }
+
+    private sealed class TestAiJobRecommendationRanker : IAiJobRecommendationRanker
+    {
+        public string AlgorithmVersion => "ai-semantic-ranking-v1:test-model";
+
+        public Task<IReadOnlyCollection<AiJobMatchScore>> RankAsync(
+            CandidateMatchProfile candidate,
+            IReadOnlyCollection<JobResult> jobs,
+            CancellationToken cancellationToken = default)
+        {
+            var candidateSkills = candidate.Skills.ToHashSet(
+                StringComparer.OrdinalIgnoreCase);
+            IReadOnlyCollection<AiJobMatchScore> scores = jobs
+                .Select(job =>
+                {
+                    var matched = job.Skills
+                        .Where(skill => candidateSkills.Contains(skill.Name))
+                        .Select(skill => skill.Name)
+                        .ToArray();
+                    var missing = job.Skills
+                        .Where(skill => skill.IsRequired && !candidateSkills.Contains(skill.Name))
+                        .Select(skill => skill.Name)
+                        .ToArray();
+                    var breakdown = new MatchBreakdown(40m, 25m, 15m, 10m, 10m);
+                    return new AiJobMatchScore(
+                        job.Id,
+                        breakdown.Total,
+                        breakdown,
+                        matched,
+                        missing,
+                        [
+                            "Test AI ranking found relevant professional evidence.",
+                            "Test AI ranking evaluated the complete job profile."
+                        ]);
+                })
+                .ToArray();
+            return Task.FromResult(scores);
+        }
     }
 }
