@@ -45,13 +45,13 @@ Each part should finish with working code, automated verification, a focused com
 - Clear reserved screens for Part 6 recommendations and Part 8 applications
 - Mobile validation and widget tests
 
-## Part 6 - CV processing and deterministic ranking
+## Part 6 - CV processing and AI semantic ranking
 
 - Status: complete and merged
 - Secure CV upload and storage abstraction
 - Structured CV profile and user correction flow
-- Testable weighted job-matching engine
-- Match breakdowns and explanations
+- Validated AI semantic job-ranking engine with no misleading score fallback
+- Skills, role, experience, education, and location breakdowns with explanations
 
 ## Part 7 - Controlled Agentic AI workflow
 

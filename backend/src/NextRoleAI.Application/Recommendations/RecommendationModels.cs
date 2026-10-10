@@ -1,5 +1,5 @@
 using NextRoleAI.Application.Jobs;
-using NextRoleAI.Domain.Jobs;
+using NextRoleAI.Application.Cvs;
 
 namespace NextRoleAI.Application.Recommendations;
 
@@ -7,28 +7,24 @@ public sealed record CandidateMatchProfile(
     string CurrentJobTitle,
     string PreferredJobTitle,
     string PreferredLocation,
+    string ProfessionalSummary,
     int YearsExperience,
-    IReadOnlyCollection<string> Skills);
-
-public sealed record JobMatchInput(
-    string Title,
-    string Location,
-    WorkMode WorkMode,
-    int MinimumYearsExperience,
-    IReadOnlyCollection<JobSkillInput> Skills);
+    IReadOnlyCollection<string> Skills,
+    IReadOnlyCollection<CvEducationItem> Education);
 
 public sealed record MatchBreakdown(
-    decimal RequiredSkills,
-    decimal PreferredSkills,
-    decimal Title,
-    decimal Experience,
-    decimal Location)
+    decimal SkillsFit,
+    decimal RoleFit,
+    decimal ExperienceFit,
+    decimal EducationFit,
+    decimal LocationFit)
 {
     public decimal Total =>
-        RequiredSkills + PreferredSkills + Title + Experience + Location;
+        SkillsFit + RoleFit + ExperienceFit + EducationFit + LocationFit;
 }
 
-public sealed record MatchScore(
+public sealed record AiJobMatchScore(
+    Guid JobId,
     decimal Score,
     MatchBreakdown Breakdown,
     IReadOnlyCollection<string> MatchedSkills,
@@ -47,7 +43,8 @@ public sealed record JobRecommendationResult(
 public enum RecommendationError
 {
     None,
-    ConfirmedCvRequired
+    ConfirmedCvRequired,
+    AiRankingUnavailable
 }
 
 public sealed record RecommendationListResult(
@@ -60,6 +57,7 @@ public sealed record RecommendationListResult(
     public static RecommendationListResult Success(
         IReadOnlyCollection<JobRecommendationResult> items) => new(items);
 
-    public static RecommendationListResult Failure(string message) =>
-        new([], RecommendationError.ConfirmedCvRequired, message);
+    public static RecommendationListResult Failure(
+        RecommendationError error,
+        string message) => new([], error, message);
 }

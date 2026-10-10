@@ -9,7 +9,7 @@
 
 - React and Flutter are untrusted public clients.
 - ASP.NET Core is the only public application and authorization boundary.
-- PostgreSQL, agent tools, private file storage, and the Resend notification provider are dependencies accessed only through the API.
+- PostgreSQL, agent tools, private file storage, the OpenAI-compatible model provider, and the Resend notification provider are dependencies accessed only through the API.
 - A model response is untrusted input until its schema and business rules pass deterministic validation.
 
 ## Current controlled-agent scenario

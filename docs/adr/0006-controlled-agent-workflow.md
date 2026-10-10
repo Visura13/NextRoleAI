@@ -5,7 +5,7 @@
 
 ## Context
 
-NextRoleAI needs a demonstrable agentic workflow with multiple specialized agents, tool use, durable state, observable decisions, validation, and a human approval boundary. It must remain affordable and reproducible for local development and marking. The existing matching algorithm and confirmed CV profile are already deterministic, shared by React and Flutter, and covered by automated tests.
+NextRoleAI needs a demonstrable agentic workflow with multiple specialized agents, tool use, durable state, observable decisions, validation, and a human approval boundary. The confirmed profile and shared recommendation contract are consumed by React and Flutter and covered by automated tests. ADR 0007 later replaced exact-keyword recommendation scoring with validated AI semantic ranking while retaining this workflow's deterministic safety rules.
 
 The options considered were:
 
@@ -30,7 +30,7 @@ No hidden chain-of-thought or free-form model reasoning is persisted or shown. T
 
 ## Consequences
 
-- The complete workflow runs without a paid model, API key, or extra service.
+- Workflow orchestration and safety validation remain typed C# logic; its ranking tool now requires the configured AI provider described in ADR 0007.
 - React and Flutter observe and control the same durable workflow through one API.
 - Tests can reproduce the golden path, prompt-injection failures, and unexpected-tool rejection.
 - The implementation demonstrates delegation, tool use, state transitions, validation, and human oversight rather than presenting ordinary ranking as an opaque AI call.

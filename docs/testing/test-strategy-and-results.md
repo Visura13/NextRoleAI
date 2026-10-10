@@ -4,9 +4,9 @@
 
 | Layer | Command | Current automated scope |
 |---|---|---|
-| Backend unit | `dotnet test NextRoleAI.sln --configuration Release` | 32 cases covering health/controller behavior, refresh-token lifecycle, scoring, application transitions, database-URL configuration, planning, prompt safety, and deterministic agent validation |
+| Backend unit | `dotnet test NextRoleAI.sln --configuration Release` | Cases covering health/controller behavior, refresh-token lifecycle, validated AI ranking, application transitions, database-URL configuration, planning, prompt safety, and deterministic agent safety validation |
 | Backend integration | same command with `NEXTROLEAI_TEST_CONNECTION_STRING` | 10 PostgreSQL-backed journeys covering authentication, ownership, constraints, CRUD/search/filter/sort/pagination, CV replacement and confirmation, recommendations, agent approval, applications, Swagger, security headers, and role authorization |
-| React | `npm test -- --run` | 9 component/client cases covering forms, protected routes, role separation, job display, workflow approval evidence, application views, and multipart requests |
+| React | `npm test -- --run` | Component/client cases covering forms, protected routes, role separation, AI ranking evidence, job display, workflow approval evidence, application views, and multipart requests |
 | Flutter | `flutter test` | 18 API, state, validation, workflow, application, and widget cases |
 | Static quality | `npm run lint`, `npm run build`, `flutter analyze`, Dart format, .NET Release build | Compilation, type checking, linting, formatting, and platform packaging |
 
@@ -23,7 +23,7 @@ PostgreSQL integration tests intentionally skip when the disposable test connect
 
 ## End-to-end trace
 
-`CvAndRecommendationEndpointsTests.JobSeeker_CanUploadConfirmAndRankJobs` covers Job Seeker registration, profile, real DOCX upload, extraction, replacement, confirmation, Recruiter/company/job publication, deterministic recommendation, controlled agent execution, cross-owner denial, approval, prompt-injection safe failure, and CV deletion against PostgreSQL.
+`CvAndRecommendationEndpointsTests.JobSeeker_CanUploadConfirmAndRankJobs` covers Job Seeker registration, profile, real DOCX upload, extraction, replacement, confirmation, Recruiter/company/job publication, the shared recommendation contract, controlled agent execution, cross-owner denial, approval, prompt-injection safe failure, and CV deletion against PostgreSQL. Unit tests separately verify semantic AI ranking, score bounds, complete job coverage, and evidence allow-listing without making a live provider call in CI.
 
 `ApplicationWorkflowEndpointsTests.ApplicationLifecycle_IsOwnedAuditedAndVisibleAcrossRoles` continues the shared workflow through application submission, Recruiter review/decision, owner-visible status history, and notification audit. The React and Flutter tests verify their corresponding UI state and API adapter behavior.
 

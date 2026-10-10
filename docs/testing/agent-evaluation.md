@@ -18,6 +18,6 @@ The evaluation separates deterministic safety/business checks from the quality o
 
 ## Manual evaluation set
 
-Run at least five repeatable scenarios against the deployed API: strong match, weak match, remote-only request, no suitable jobs, and injection attempt. For each, record workflow ID, objective, expected outcome, actual status, shortlisted IDs/scores, validation rules, approval state, step duration, and pass/fail. Use the same seeded data when comparing runs so deterministic ranking can be reproduced.
+Run at least five repeatable scenarios against the deployed API: strong match, weak match, remote-only request, no suitable jobs, and injection attempt. For each, record workflow ID, objective, expected outcome, actual status, shortlisted IDs/scores, validation rules, approval state, step duration, algorithm/model version, and pass/fail. Use the same seeded data when comparing runs; model output may vary, so evaluate ranking relevance and evidence instead of claiming bit-for-bit reproducibility.
 
 Never record hidden reasoning. The evidence is the structured plan, bounded tool calls, validation results, durations, approval decisions, and final state returned by the API.

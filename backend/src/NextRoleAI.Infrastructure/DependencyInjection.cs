@@ -76,6 +76,7 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(NotificationOptions.SectionName));
 
         services.AddSingleton(TimeProvider.System);
+        services.AddMemoryCache();
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
@@ -134,7 +135,7 @@ public static class DependencyInjection
         services.AddSingleton<ICvLanguageModelClient, OpenAiCompatibleCvLanguageModelClient>();
         services.AddSingleton<ICvAnalyzer, AiCvAnalyzer>();
         services.AddScoped<ICvService, CvService>();
-        services.AddSingleton<IJobMatchScorer, DeterministicJobMatchScorer>();
+        services.AddSingleton<IAiJobRecommendationRanker, AiJobRecommendationRanker>();
         services.AddScoped<IRecommendationService, RecommendationService>();
         services.AddScoped<IAgentWorkflowStore, AgentWorkflowStore>();
         services.AddScoped<IAgentTool, CandidateProfileReadTool>();

@@ -1,6 +1,6 @@
 # System architecture
 
-NextRoleAI uses one HTTP API as the trust boundary for both clients. Browser and mobile code never connect directly to PostgreSQL, CV storage, the notification provider, or agent tools.
+NextRoleAI uses one HTTP API as the trust boundary for both clients. Browser and mobile code never connect directly to PostgreSQL, CV storage, the AI/notification providers, or agent tools.
 
 ```mermaid
 flowchart LR
@@ -18,6 +18,7 @@ flowchart LR
     APP --> DB
     AGENT --> DB
     APP --> FILES[(Private CV file store)]
+    APP -->|server-side API key| AI[OpenAI-compatible model API]
     APP -->|server-side API key| RESEND[Resend email API]
 
     AGENT --> PLAN[Planning Agent]
@@ -33,7 +34,7 @@ flowchart LR
 - `NextRoleAI.Api` owns HTTP concerns, Swagger, authentication middleware, CORS, and composition.
 - `NextRoleAI.Application` owns use-case contracts and service interfaces.
 - `NextRoleAI.Domain` owns entities, statuses, and business rules.
-- `NextRoleAI.Infrastructure` owns EF Core/PostgreSQL, Identity, private file storage, and Resend.
+- `NextRoleAI.Infrastructure` owns EF Core/PostgreSQL, Identity, private file storage, AI-provider integration, and Resend.
 - `NextRoleAI.AgenticAI` owns bounded orchestration, allow-listed tools, validation, retries, timeouts, and approval gates.
 
 ## Deployment topology

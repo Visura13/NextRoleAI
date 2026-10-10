@@ -124,7 +124,7 @@ public sealed class ValidationSafetyAgent(ObjectiveGuard objectiveGuard)
         rules.Add(new(
             "ScoreRange",
             shortlist.All(item => item.Score is >= 40m and <= 100m),
-            "Every proposed job has a deterministic score between 40 and 100."));
+            "Every proposed job has a validated AI score between 40 and 100."));
 
         var allowList = new HashSet<string>(
             [AgentToolNames.ReadCandidateProfile, AgentToolNames.RankPublishedJobs],

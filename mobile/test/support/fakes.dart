@@ -192,16 +192,16 @@ JobRecommendation sampleRecommendation() => JobRecommendation(
   job: sampleJob(),
   score: 92.5,
   breakdown: const MatchBreakdown(
-    requiredSkills: 45,
-    preferredSkills: 12.5,
-    title: 15,
-    experience: 10,
-    location: 10,
+    skillsFit: 38,
+    roleFit: 24.5,
+    experienceFit: 12,
+    educationFit: 8,
+    locationFit: 10,
   ),
   matchedSkills: const ['Flutter'],
   missingRequiredSkills: const [],
   reasons: const ['Matches 1 listed skill.'],
-  algorithmVersion: 'deterministic-v1',
+  algorithmVersion: 'ai-semantic-ranking-v1:test-model',
 );
 
 class FakeRecommendationsDataSource implements RecommendationsDataSource {

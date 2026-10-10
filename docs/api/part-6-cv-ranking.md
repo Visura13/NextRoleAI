@@ -1,6 +1,6 @@
-# Part 6 CV processing and deterministic ranking
+# Part 6 CV processing and AI semantic ranking
 
-Part 6 turns an authenticated Job Seeker's PDF or DOCX into a reviewable structured profile and ranks currently published jobs with an explainable, deterministic algorithm. React and Flutter use the same API and business rules.
+Part 6 turns an authenticated Job Seeker's PDF or DOCX into a reviewable structured profile and ranks currently published jobs with explainable AI semantic analysis. React and Flutter use the same API and business rules.
 
 ## CV workflow
 
@@ -15,9 +15,9 @@ Supported endpoints, all restricted to the `JobSeeker` role:
 - `POST /api/cv` uploads or replaces the current CV.
 - `PUT /api/cv/profile` corrects and confirms the extracted profile.
 - `DELETE /api/cv` deletes the current CV or returns `404`.
-- `GET /api/recommendations?limit=20` returns ranked published jobs; it returns `409` until the CV profile is confirmed.
+- `GET /api/recommendations?limit=20` returns ranked published jobs; it returns `409` until the CV profile is confirmed and `503` if AI ranking is unavailable.
 
-The profile update contains `candidateName`, `email`, `phone`, `location`, `currentJobTitle`, `professionalSummary`, `yearsExperience`, and one to fifty `skills`.
+The profile update contains `candidateName`, `email`, `phone`, `location`, `currentJobTitle`, `professionalSummary`, `yearsExperience`, one to fifty `skills`, and reviewable tertiary/professional `education` entries.
 
 ## Storage and privacy
 
@@ -27,7 +27,7 @@ The original file is never stored in Git or a web-public directory. With no over
 $env:CvStorage__RootPath = "D:\private-nextroleai-cvs"
 ```
 
-AI-assisted profile extraction and CV-quality review are optional and disabled by default. Configure an OpenAI-compatible chat-completions provider through `CvAi__Enabled`, `CvAi__BaseUrl`, `CvAi__ApiKey`, and `CvAi__Model`. The provider receives redacted CV text, returns structured JSON, and is constrained by deterministic evidence validation. Only tertiary or professional education such as certificates, diplomas and degrees is retained; school-level O/L and A/L entries are excluded. If the provider times out, fails, or returns invalid data, upload continues with deterministic extraction and no quality score.
+Configure an OpenAI-compatible chat-completions provider through `CvAi__Enabled`, `CvAi__BaseUrl`, `CvAi__ApiKey`, and `CvAi__Model`. For CV upload, the provider receives redacted text, returns structured JSON, and is constrained by deterministic evidence validation. Only tertiary or professional education such as certificates, diplomas and degrees is retained; school-level O/L and A/L entries are excluded. If CV analysis fails, upload continues with basic extraction and no quality score. Recommendations are different: they require the AI provider and deliberately return `503` instead of substituting an inaccurate keyword score.
 
 Only metadata and extracted information are returned by the API; this increment deliberately has no file-download endpoint. The database stores a SHA-256 checksum for integrity and traceability. Local storage is for development and marking. Production should use encrypted private object storage, retention/deletion controls, malware scanning, and backups.
 
@@ -35,20 +35,21 @@ Only metadata and extracted information are returned by the API; this increment 
 
 `GET /api/recommendations` returns an `items` collection ordered by descending score. Each item contains the public job, total `score`, component `breakdown`, `matchedSkills`, `missingRequiredSkills`, explanatory `reasons`, and `algorithmVersion`.
 
-The `deterministic-v1` score is out of 100:
+The `ai-semantic-ranking-v1:<model>` score is out of 100. The model evaluates all candidate jobs together and recognises semantic and transferable evidence rather than requiring exact keyword equality:
 
 | Component | Points | Rule |
 | --- | ---: | --- |
-| Required skills | 45 | Proportion of required job skills present in the confirmed CV/profile skill union |
-| Preferred skills | 15 | Proportion of optional job skills present |
-| Title | 15 | Token overlap with the current or preferred job title |
-| Experience | 15 | Candidate years divided by the required years, capped at full credit |
-| Location | 10 | Preferred/CV location matches, or the job is remote |
+| Skills fit | 40 | Technical, domain, and transferable skill evidence |
+| Role fit | 25 | Alignment with the title and described responsibilities |
+| Experience fit | 15 | Relevant depth compared with the stated minimum |
+| Education fit | 10 | Relevant higher/professional education, without penalising jobs that do not require it |
+| Location fit | 10 | Location and work-mode compatibility |
 
-No LLM is used for this score. Part 7 may add controlled agents around the workflow while keeping deterministic validation and visible evidence.
+Candidate and job text is treated as untrusted data, protected characteristics are excluded, every job ID and component bound is validated, and evidence lists are restricted to supplied candidate/job values. Jobs are processed in bounded batches of ten; every supplied job must appear exactly once within its batch with at least two reasons. The server sums the bounded components and shows no ranking if validation fails. Successful results are cached for ten minutes and automatically invalidated by CV, profile, job, or model-version changes to reduce provider cost.
 
 ## Known limits
 
 - Scanned-image PDFs need OCR and are rejected when no useful text is found.
-- The draft parser uses a bounded skill vocabulary, so the user correction step is mandatory.
+- Basic fallback extraction uses a bounded skill vocabulary, so AI configuration and the user correction step remain important.
 - The current recommendation query ranks the newest 100 published jobs and returns at most the requested limit.
+- Ranking quality and availability depend on the configured provider, model, API quota, and sufficiently descriptive job posts.
