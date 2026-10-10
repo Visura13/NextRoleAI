@@ -172,6 +172,8 @@ label small { color: var(--muted); font-weight: 400; }
 .action-panel h2 { font-size: 1.55rem; margin-bottom: 8px; }
 .action-panel p:last-child { color: var(--muted); margin-bottom: 0; }
 .surface-form { background: white; border: 1px solid var(--line); border-radius: 15px 15px 15px 4px; padding: clamp(22px,4vw,38px); margin-top: 0; }
+.profile-workspace-section { display: grid; gap: 28px; }
+.profile-workspace-section .section-heading { margin-bottom: 0; }
 .surface-form fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
 .surface-form legend { color: #38453f; font-weight: 700; font-size: .9rem; padding: 0 5px; }
 .optional { color: var(--muted); font-weight: 400; font-size: .78rem; }

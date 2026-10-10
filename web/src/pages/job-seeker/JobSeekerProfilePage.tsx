@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { api, ApiError, swrFetcher } from '../../api/client';
 import type { JobSeekerProfile } from '../../api/types';
 import { ErrorState, LoadingState, Notice } from '../../components/States';
+import { CvWorkspace } from './CvPage';
 
 interface ProfileForm {
   headline: string;
@@ -69,7 +70,9 @@ export function JobSeekerProfilePage() {
 
   return (
     <div className="page-stack">
-      <header className="portal-header"><p className="eyebrow">Job seeker profile</p><h1>Shape the signal recruiters and matching will see.</h1><p>Preferences here complement the skills and experience in your confirmed CV profile.</p></header>
+      <header className="portal-header"><p className="eyebrow">My profile</p><h1>Manage your complete career profile.</h1><p>Keep your CV evidence, AI analysis, higher education, preferences, and salary expectations together in one workspace.</p></header>
+      <CvWorkspace embedded />
+      <div className="section-heading"><p className="eyebrow">Job preferences</p><h2>Tell NextRoleAI what you want next.</h2><p>These preferences complement the evidence extracted from your confirmed CV and influence job ranking.</p></div>
       <form className="surface-form" onSubmit={submit}>
         {feedback && <Notice kind={feedback.kind}>{feedback.message}</Notice>}
         <div className="form-grid"><label>Professional headline<input maxLength={160} value={form.headline} onChange={(event) => setForm({ ...form, headline: event.target.value })} placeholder="Backend engineer focused on reliable systems" /></label><label>Preferred job title<input maxLength={150} value={form.preferredJobTitle} onChange={(event) => setForm({ ...form, preferredJobTitle: event.target.value })} placeholder="Software Engineer" /></label></div>

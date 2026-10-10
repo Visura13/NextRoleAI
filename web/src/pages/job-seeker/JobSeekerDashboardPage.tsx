@@ -17,7 +17,7 @@ export function JobSeekerDashboardPage() {
         <article className="metric-card"><span>Skills captured</span><strong>{profile?.skills.length ?? 0}</strong><p>Your confirmed profile and CV skills contribute to matching.</p></article>
         <article className="metric-card"><span>Application activity</span><strong>—</strong><p>Application tracking arrives with the shared workflow in Part 8.</p></article>
       </div>
-      <section className="action-panel"><div><p className="eyebrow">CV-powered matching</p><h2>Build recommendations you can inspect.</h2><p>Review the extracted CV profile before any document data influences a score, then delegate a shortlist without giving up the final decision.</p></div><div className="button-row"><Link className="button button--secondary" to="/job-seeker/cv">Review my CV</Link><Link className="button button--secondary" to="/job-seeker/recommendations">View recommendations</Link><Link className="button" to="/job-seeker/agent-workflows">Run AI workflow</Link></div></section>
+      <section className="action-panel"><div><p className="eyebrow">CV-powered matching</p><h2>Build recommendations you can inspect.</h2><p>Review the extracted CV profile before any document data influences a score, then delegate a shortlist without giving up the final decision.</p></div><div className="button-row"><Link className="button button--secondary" to="/job-seeker/profile">Review my profile</Link><Link className="button button--secondary" to="/job-seeker/recommendations">View recommendations</Link><Link className="button" to="/job-seeker/agent-workflows">Run AI workflow</Link></div></section>
     </div>
   );
 }
