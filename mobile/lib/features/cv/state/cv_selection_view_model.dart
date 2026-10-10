@@ -17,6 +17,7 @@ class CvSelectionViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool _isUploading = false;
   bool _isSaving = false;
+  bool _hasLoaded = false;
   String? _errorMessage;
   String? _successMessage;
 
@@ -26,6 +27,7 @@ class CvSelectionViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isUploading => _isUploading;
   bool get isSaving => _isSaving;
+  bool get hasLoaded => _hasLoaded;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
 
@@ -42,6 +44,7 @@ class CvSelectionViewModel extends ChangeNotifier {
       _errorMessage = 'Your CV profile could not be loaded.';
     } finally {
       _isLoading = false;
+      _hasLoaded = true;
       notifyListeners();
     }
   }

@@ -2,45 +2,41 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import useSWR from 'swr';
 import { api, ApiError, swrFetcher } from '../../api/client';
-import type { JobSeekerProfile } from '../../api/types';
+import type { CvProfile, JobSeekerProfile } from '../../api/types';
 import { ErrorState, LoadingState, Notice } from '../../components/States';
 import { CvWorkspace } from './CvPage';
 
 interface ProfileForm {
-  headline: string;
-  summary: string;
   location: string;
   preferredJobTitle: string;
   preferredSalary: string;
-  yearsOfExperience: number;
-  skills: string;
 }
 
-const emptyForm: ProfileForm = { headline: '', summary: '', location: '', preferredJobTitle: '', preferredSalary: '', yearsOfExperience: 0, skills: '' };
+const emptyForm: ProfileForm = { location: '', preferredJobTitle: '', preferredSalary: '' };
 
 export function JobSeekerProfilePage() {
   const navigate = useNavigate();
   const { data, error, isLoading, mutate } = useSWR<JobSeekerProfile>('/api/profiles/job-seeker', swrFetcher);
+  const { data: cv } = useSWR<CvProfile>('/api/cv', swrFetcher, { shouldRetryOnError: false });
   const [editedForm, setForm] = useState<ProfileForm | null>(null);
   const [feedback, setFeedback] = useState<{ kind: 'success' | 'error'; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const form = editedForm ?? (data ? {
-    headline: data.headline,
-    summary: data.summary,
     location: data.location,
     preferredJobTitle: data.preferredJobTitle,
     preferredSalary: data.preferredSalary?.toString() ?? '',
-    yearsOfExperience: data.yearsOfExperience,
-    skills: data.skills.join(', '),
-  } : emptyForm);
+  } : { ...emptyForm, location: cv?.location ?? '' });
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setFeedback(null);
-    const skills = [...new Set(form.skills.split(',').map((skill) => skill.trim()).filter(Boolean))];
-    if (!form.headline.trim() || !form.summary.trim() || !form.location.trim() || !form.preferredJobTitle.trim()) {
-      setFeedback({ kind: 'error', message: 'Complete all profile fields before saving.' });
+    if (!cv || cv.status !== 'Confirmed') {
+      setFeedback({ kind: 'error', message: 'Upload and confirm your professional profile before saving job preferences.' });
+      return;
+    }
+    if (!form.location.trim() || !form.preferredJobTitle.trim()) {
+      setFeedback({ kind: 'error', message: 'Add your preferred job title and work location before saving.' });
       return;
     }
     const preferredSalary = form.preferredSalary.trim()
@@ -54,7 +50,15 @@ export function JobSeekerProfilePage() {
     try {
       const saved = await api.request<JobSeekerProfile>('/api/profiles/job-seeker', {
         method: 'PUT',
-        body: JSON.stringify({ ...form, preferredSalary, headline: form.headline.trim(), summary: form.summary.trim(), location: form.location.trim(), preferredJobTitle: form.preferredJobTitle.trim(), skills }),
+        body: JSON.stringify({
+          headline: cv.currentJobTitle,
+          summary: cv.professionalSummary,
+          location: form.location.trim(),
+          preferredJobTitle: form.preferredJobTitle.trim(),
+          preferredSalary,
+          yearsOfExperience: cv.yearsExperience,
+          skills: cv.skills,
+        }),
       }, true);
       await mutate(saved, { revalidate: false });
       navigate('/job-seeker/recommendations', { replace: true });
@@ -75,12 +79,10 @@ export function JobSeekerProfilePage() {
       <div className="section-heading"><p className="eyebrow">Job preferences</p><h2>Tell NextRoleAI what you want next.</h2><p>These preferences complement the evidence extracted from your confirmed CV and influence job ranking.</p></div>
       <form className="surface-form" onSubmit={submit}>
         {feedback && <Notice kind={feedback.kind}>{feedback.message}</Notice>}
-        <div className="form-grid"><label>Professional headline<input maxLength={160} value={form.headline} onChange={(event) => setForm({ ...form, headline: event.target.value })} placeholder="Backend engineer focused on reliable systems" /></label><label>Preferred job title<input maxLength={150} value={form.preferredJobTitle} onChange={(event) => setForm({ ...form, preferredJobTitle: event.target.value })} placeholder="Software Engineer" /></label></div>
-        <label>Professional summary<textarea maxLength={2000} rows={6} value={form.summary} onChange={(event) => setForm({ ...form, summary: event.target.value })} placeholder="Describe your experience, strengths, and the work you want to do." /></label>
-        <div className="form-grid"><label>Location<input maxLength={150} value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} placeholder="Colombo" /></label><label>Years of experience<input type="number" min={0} max={80} value={form.yearsOfExperience} onChange={(event) => setForm({ ...form, yearsOfExperience: Number(event.target.value) })} /></label></div>
+        <div className="form-grid"><label>Preferred job title<input maxLength={150} value={form.preferredJobTitle} onChange={(event) => setForm({ ...form, preferredJobTitle: event.target.value })} placeholder="Software Engineer" /></label><label>Preferred work location<input maxLength={150} value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} placeholder="Colombo" /></label></div>
         <label>Preferred minimum monthly salary (LKR) <span className="optional">Optional</span><input type="number" min={1} max={1000000000} step={1} value={form.preferredSalary} onChange={(event) => setForm({ ...form, preferredSalary: event.target.value })} placeholder="200000" /><small>The AI uses this only when a job advertises a comparable salary range.</small></label>
-        <label>Skills<input value={form.skills} onChange={(event) => setForm({ ...form, skills: event.target.value })} placeholder="C#, React, PostgreSQL, Azure" /><small>Separate each skill with a comma. Up to 30 skills.</small></label>
-        <div className="form-actions"><button className="button" disabled={submitting} type="submit">{submitting ? 'Saving…' : 'Save profile'}</button></div>
+        {(!cv || cv.status !== 'Confirmed') && <Notice kind="info">Upload and confirm your professional profile above before saving preferences.</Notice>}
+        <div className="form-actions"><button className="button" disabled={submitting || !cv || cv.status !== 'Confirmed'} type="submit">{submitting ? 'Saving…' : 'Save preferences and view recommendations'}</button></div>
       </form>
     </div>
   );

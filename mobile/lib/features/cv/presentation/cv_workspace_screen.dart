@@ -6,14 +6,27 @@ import '../../../core/widgets/states.dart';
 import '../models/cv_profile.dart';
 import '../state/cv_selection_view_model.dart';
 
-class CvWorkspaceScreen extends StatefulWidget {
+class CvWorkspaceScreen extends StatelessWidget {
   const CvWorkspaceScreen({super.key});
 
   @override
-  State<CvWorkspaceScreen> createState() => _CvWorkspaceScreenState();
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('My profile')),
+    body: const SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(20, 8, 20, 36),
+      child: CvWorkspaceSection(),
+    ),
+  );
 }
 
-class _CvWorkspaceScreenState extends State<CvWorkspaceScreen> {
+class CvWorkspaceSection extends StatefulWidget {
+  const CvWorkspaceSection({super.key});
+
+  @override
+  State<CvWorkspaceSection> createState() => _CvWorkspaceSectionState();
+}
+
+class _CvWorkspaceSectionState extends State<CvWorkspaceSection> {
   final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _email = TextEditingController();
@@ -28,9 +41,10 @@ class _CvWorkspaceScreenState extends State<CvWorkspaceScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<CvSelectionViewModel>().load(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = context.read<CvSelectionViewModel>();
+      if (!viewModel.hasLoaded) viewModel.load();
+    });
   }
 
   @override
@@ -115,167 +129,160 @@ class _CvWorkspaceScreenState extends State<CvWorkspaceScreen> {
     final profile = viewModel.profile;
     if (profile != null) _populate(profile);
     if (viewModel.isLoading) {
-      return const Scaffold(body: LoadingPanel(label: 'Loading your CV'));
+      return const LoadingPanel(label: 'Loading your professional profile');
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Your CV')),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 36),
-        children: [
-          Text(
-            'Turn your CV into a profile you control.',
-            style: Theme.of(context).textTheme.headlineSmall
-                ?.copyWith(fontWeight: FontWeight.w900),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Your professional profile',
+          style: Theme.of(context).textTheme.headlineSmall
+              ?.copyWith(fontWeight: FontWeight.w900),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Your confirmed CV is the source for your experience, skills, education, and professional summary. Upload a PDF or DOCX up to 5 MB, then correct and confirm the extracted details.',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Upload a PDF or DOCX up to 5 MB, then review every extracted field.',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 18),
-          if (viewModel.errorMessage != null) ...[
-            FeedbackBanner(message: viewModel.errorMessage!, isError: true),
-            const SizedBox(height: 14),
-          ],
-          if (viewModel.successMessage != null) ...[
-            FeedbackBanner(message: viewModel.successMessage!),
-            const SizedBox(height: 14),
-          ],
-          _UploadCard(viewModel: viewModel, onDelete: _delete),
-          if (profile != null) ...[
-            const SizedBox(height: 20),
-            Form(
-              key: _formKey,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  profile.originalFileName,
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.w800),
-                                ),
-                                Text(
-                                  '${(profile.sizeBytes / 1024).toStringAsFixed(1)} KB · ${profile.sha256Checksum.substring(0, 12)}…',
-                                ),
-                              ],
-                            ),
+        ),
+        const SizedBox(height: 18),
+        if (viewModel.errorMessage != null) ...[
+          FeedbackBanner(message: viewModel.errorMessage!, isError: true),
+          const SizedBox(height: 14),
+        ],
+        if (viewModel.successMessage != null) ...[
+          FeedbackBanner(message: viewModel.successMessage!),
+          const SizedBox(height: 14),
+        ],
+        _UploadCard(viewModel: viewModel, onDelete: _delete),
+        if (profile != null) ...[
+          const SizedBox(height: 20),
+          Form(
+            key: _formKey,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                profile.originalFileName,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w800),
+                              ),
+                              Text(
+                                '${(profile.sizeBytes / 1024).toStringAsFixed(1)} KB · ${profile.sha256Checksum.substring(0, 12)}…',
+                              ),
+                            ],
                           ),
-                          Chip(
-                            label: Text(
-                              profile.isConfirmed
-                                  ? 'Confirmed'
-                                  : 'Needs review',
-                            ),
+                        ),
+                        Chip(
+                          label: Text(
+                            profile.isConfirmed ? 'Confirmed' : 'Needs review',
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      const FeedbackBanner(
-                        message: 'Extraction is only a draft. Correct anything that is missing or inaccurate.',
-                      ),
-                      const SizedBox(height: 16),
-                      _required(_name, 'Candidate name'),
-                      const SizedBox(height: 12),
-                      _required(_title, 'Current job title'),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _email,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(labelText: 'Email'),
-                        validator: (value) {
-                          final email = value?.trim() ?? '';
-                          if (email.isNotEmpty && !email.contains('@')) {
-                            return 'Enter a valid email or leave it empty.';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _phone,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(labelText: 'Phone'),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _location,
-                        decoration: const InputDecoration(
-                          labelText: 'Location',
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const FeedbackBanner(
+                      message: 'Extraction is only a draft. Correct anything that is missing or inaccurate.',
+                    ),
+                    const SizedBox(height: 16),
+                    _required(_name, 'Candidate name'),
+                    const SizedBox(height: 12),
+                    _required(_title, 'Current job title'),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _email,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      validator: (value) {
+                        final email = value?.trim() ?? '';
+                        if (email.isNotEmpty && !email.contains('@')) {
+                          return 'Enter a valid email or leave it empty.';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _phone,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(labelText: 'Phone'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _location,
+                      decoration: const InputDecoration(labelText: 'Location'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _years,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Years of experience',
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _years,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Years of experience',
-                        ),
-                        validator: (value) {
-                          final years = int.tryParse(value ?? '');
-                          return years == null || years < 0 || years > 80
-                              ? 'Enter a number from 0 to 80.'
-                              : null;
-                        },
+                      validator: (value) {
+                        final years = int.tryParse(value ?? '');
+                        return years == null || years < 0 || years > 80
+                            ? 'Enter a number from 0 to 80.'
+                            : null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _summary,
+                      minLines: 4,
+                      maxLines: 7,
+                      decoration: const InputDecoration(
+                        labelText: 'Professional summary',
+                        alignLabelWithHint: true,
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _summary,
-                        minLines: 4,
-                        maxLines: 7,
-                        decoration: const InputDecoration(
-                          labelText: 'Professional summary',
-                          alignLabelWithHint: true,
-                        ),
-                        validator: (value) => (value?.trim().length ?? 0) < 20
-                            ? 'Write at least 20 characters.'
-                            : null,
+                      validator: (value) => (value?.trim().length ?? 0) < 20
+                          ? 'Write at least 20 characters.'
+                          : null,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _skills,
+                      minLines: 2,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        labelText: 'Skills',
+                        helperText: 'Separate skills with commas',
+                        alignLabelWithHint: true,
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _skills,
-                        minLines: 2,
-                        maxLines: 4,
-                        decoration: const InputDecoration(
-                          labelText: 'Skills',
-                          helperText: 'Separate skills with commas',
-                          alignLabelWithHint: true,
-                        ),
-                        validator: (value) => (value?.trim().isEmpty ?? true)
-                            ? 'Add at least one skill.'
-                            : null,
+                      validator: (value) => (value?.trim().isEmpty ?? true)
+                          ? 'Add at least one skill.'
+                          : null,
+                    ),
+                    const SizedBox(height: 18),
+                    FilledButton.icon(
+                      onPressed: viewModel.isSaving ? null : _confirm,
+                      icon: const Icon(Icons.verified_outlined),
+                      label: Text(
+                        viewModel.isSaving
+                            ? 'Confirming…'
+                            : profile.isConfirmed
+                            ? 'Save corrections'
+                            : 'Confirm CV profile',
                       ),
-                      const SizedBox(height: 18),
-                      FilledButton.icon(
-                        onPressed: viewModel.isSaving ? null : _confirm,
-                        icon: const Icon(Icons.verified_outlined),
-                        label: Text(
-                          viewModel.isSaving
-                              ? 'Confirming…'
-                              : profile.isConfirmed
-                              ? 'Save corrections'
-                              : 'Confirm CV profile',
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 
