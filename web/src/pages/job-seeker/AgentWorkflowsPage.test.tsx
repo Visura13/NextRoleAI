@@ -75,7 +75,7 @@ describe('AgentWorkflowsPage', () => {
     } as never);
   });
 
-  it('keeps shortlist decisions while hiding technical workflow details', () => {
+  it('shows only run history and agentic search result cards', () => {
     render(<AgentWorkflowsPage />);
 
     expect(screen.getByRole('heading', { name: /Backend Engineer/ })).toBeInTheDocument();
@@ -83,7 +83,13 @@ describe('AgentWorkflowsPage', () => {
     expect(screen.queryByText('Execution history')).not.toBeInTheDocument();
     expect(screen.queryByText('Human approval required')).not.toBeInTheDocument();
     expect(screen.queryByText(/ToolAllowList/)).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Approve shortlist' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Reject' })).toBeEnabled();
+    expect(screen.queryByText('PendingApproval')).not.toBeInTheDocument();
+    expect(screen.queryByText('One job passed validation.')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Decision note/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Revised objective')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Approve shortlist' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Request revision' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reject' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Agentic search results' })).toBeInTheDocument();
   });
 });

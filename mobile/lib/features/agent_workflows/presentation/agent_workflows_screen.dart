@@ -17,7 +17,6 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
   final objectiveController = TextEditingController(
     text: 'Find the best 3 software engineering jobs for my confirmed profile.',
   );
-  final feedbackController = TextEditingController();
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
   @override
   void dispose() {
     objectiveController.dispose();
-    feedbackController.dispose();
     super.dispose();
   }
 
@@ -42,7 +40,7 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
         children: [
           Text(
-            'CONTROLLED AGENTIC AI',
+            'AGENTIC JOB SEARCH',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: AppTheme.orange,
               fontWeight: FontWeight.w800,
@@ -51,13 +49,13 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Delegate the search. Keep the final say.',
+            'Delegate the search. Discover your best-fit roles.',
             style: Theme.of(context).textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 8),
           const Text(
-            'Four agents plan, inspect your confirmed profile, discover roles, and validate the shortlist. Publication pauses for your approval.',
+            'Specialized agents use your confirmed profile to find and rank relevant opportunities.',
           ),
           const SizedBox(height: 20),
           Card(
@@ -119,7 +117,7 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
                     (workflow) => DropdownMenuItem(
                       value: workflow.id,
                       child: Text(
-                        '${workflow.status} · ${workflow.objective}',
+                        workflow.objective,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -137,19 +135,7 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
           ],
           if (model.selected case final workflow?) ...[
             const SizedBox(height: 18),
-            _WorkflowDetails(
-              workflow: workflow,
-              isBusy: model.isLoading,
-              objectiveController: objectiveController,
-              feedbackController: feedbackController,
-              onDecision: (decision) => model.decide(
-                decision: decision,
-                feedback: feedbackController.text,
-                revisedObjective: decision == 'RequestRevision'
-                    ? objectiveController.text
-                    : null,
-              ),
-            ),
+            _WorkflowDetails(workflow: workflow),
           ] else if (!model.isLoading) ...[
             const SizedBox(height: 30),
             const Center(child: Text('No workflow history yet.')),
@@ -161,59 +147,28 @@ class _AgentWorkflowsScreenState extends State<AgentWorkflowsScreen> {
 }
 
 class _WorkflowDetails extends StatelessWidget {
-  const _WorkflowDetails({
-    required this.workflow,
-    required this.isBusy,
-    required this.objectiveController,
-    required this.feedbackController,
-    required this.onDecision,
-  });
+  const _WorkflowDetails({required this.workflow});
 
   final AgentWorkflow workflow;
-  final bool isBusy;
-  final TextEditingController objectiveController;
-  final TextEditingController feedbackController;
-  final ValueChanged<String> onDecision;
 
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      Card(
-        color: AppTheme.forestDeep,
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${workflow.status} · ${workflow.approvalStatus}',
-                style: const TextStyle(
-                  color: AppTheme.lime,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                workflow.finalSummary ?? workflow.objective,
-                style: const TextStyle(color: Colors.white, height: 1.45),
-              ),
-              if (workflow.failureMessage != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  '${workflow.failureCode}: ${workflow.failureMessage}',
-                  style: const TextStyle(color: Color(0xFFFFC6BE)),
-                ),
-              ],
-            ],
-          ),
+      if (workflow.failureMessage != null) ...[
+        _MessagePanel(
+          message: '${workflow.failureCode}: ${workflow.failureMessage}',
+          isError: true,
         ),
+        const SizedBox(height: 18),
+      ],
+      Text(
+        'Agentic search results',
+        style: Theme.of(context).textTheme.titleLarge,
       ),
-      const SizedBox(height: 18),
-      Text('Proposed shortlist', style: Theme.of(context).textTheme.titleLarge),
       const SizedBox(height: 8),
       if (workflow.shortlist.isEmpty)
-        const Text('No jobs were published by this run.')
+        const Text('No matching jobs were found by this run.')
       else
         ...workflow.shortlist.map(
           (item) => Card(
@@ -224,36 +179,9 @@ class _WorkflowDetails extends StatelessWidget {
                 '${item.companyName} · ${item.location} · ${item.workMode}\n${item.reasonSummary}',
               ),
               isThreeLine: true,
-              trailing: Icon(
-                item.isApproved ? Icons.verified : Icons.pending_outlined,
-                color: item.isApproved ? Colors.green : AppTheme.orange,
-              ),
             ),
           ),
         ),
-      if (workflow.status == 'PendingApproval') ...[
-        const SizedBox(height: 18),
-        TextField(
-          controller: feedbackController,
-          maxLength: 1000,
-          maxLines: 2,
-          decoration: const InputDecoration(
-            labelText: 'Decision note (optional)',
-          ),
-        ),
-        FilledButton(
-          onPressed: isBusy ? null : () => onDecision('Approve'),
-          child: const Text('Approve shortlist'),
-        ),
-        OutlinedButton(
-          onPressed: isBusy ? null : () => onDecision('RequestRevision'),
-          child: const Text('Request revision'),
-        ),
-        TextButton(
-          onPressed: isBusy ? null : () => onDecision('Reject'),
-          child: const Text('Reject'),
-        ),
-      ],
     ],
   );
 }

@@ -235,7 +235,6 @@ label small { color: var(--muted); font-weight: 400; }
 .agent-shortlist article { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
 .agent-shortlist .recommendation__score { position: static; width: 64px; height: 64px; border-width: 6px; }
 .agent-shortlist h4,.agent-shortlist p { margin: 0 0 3px; }
-.workflow-decision-controls { display: grid; gap: 12px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 18px; }
 .application-form h2 { margin-bottom: 4px; }
 .application-list { display: grid; gap: 18px; }
 .application-card { display: grid; gap: 18px; background: white; border: 1px solid var(--line); border-radius: 18px 18px 18px 5px; padding: 22px; box-shadow: var(--shadow); }
