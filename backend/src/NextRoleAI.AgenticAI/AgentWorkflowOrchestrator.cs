@@ -461,7 +461,7 @@ public sealed class AgentWorkflowOrchestrator(
         CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow();
-        if (code is "UnsafeObjective" or "InvalidObjective")
+        if (code is "UnsafeObjective" or "InvalidObjective" or "OutOfScopeObjective")
         {
             store.AddValidationResult(new AgentValidationResult
             {

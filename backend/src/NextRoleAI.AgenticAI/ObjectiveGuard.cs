@@ -38,9 +38,27 @@ public sealed partial class ObjectiveGuard
                 "The objective contains instruction-like content that cannot be processed safely.");
         }
 
+        if (!JobSearchIntentRegex().IsMatch(value) ||
+            !JobSearchSubjectRegex().IsMatch(value))
+        {
+            throw new AgentExecutionException(
+                "OutOfScopeObjective",
+                "This workflow only supports job-search objectives. Ask it to find, recommend, rank, or compare jobs or roles for your profile.");
+        }
+
         return value;
     }
 
     [GeneratedRegex(@"\s+")]
     private static partial Regex WhitespaceRegex();
+
+    [GeneratedRegex(
+        @"\b(find|search|recommend|suggest|show|list|rank|compare|discover|identify|match|shortlist|tell|best|top|suitable)\b",
+        RegexOptions.IgnoreCase)]
+    private static partial Regex JobSearchIntentRegex();
+
+    [GeneratedRegex(
+        @"\b(job|jobs|role|roles|position|positions|opportunity|opportunities|vacancy|vacancies|posting|postings|employment|career|careers|work)\b",
+        RegexOptions.IgnoreCase)]
+    private static partial Regex JobSearchSubjectRegex();
 }

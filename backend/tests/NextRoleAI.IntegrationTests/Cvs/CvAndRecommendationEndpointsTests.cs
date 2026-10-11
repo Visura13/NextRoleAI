@@ -202,6 +202,18 @@ public sealed class CvAndRecommendationEndpointsTests(NextRoleAIApiFactory facto
         Assert.Equal("UnsafeObjective", unsafeWorkflow.FailureCode);
         Assert.Empty(unsafeWorkflow.Shortlist);
 
+        var unrelatedWorkflowResponse = await seekerClient.PostAsJsonAsync(
+            "/api/agent-workflows",
+            new StartAgentWorkflowRequest(
+                "Tell me about Sri Lanka and its most popular tourist attractions."));
+        Assert.Equal(HttpStatusCode.Created, unrelatedWorkflowResponse.StatusCode);
+        var unrelatedWorkflow = await unrelatedWorkflowResponse.Content
+            .ReadFromJsonAsync<AgentWorkflowResult>(JsonOptions);
+        Assert.NotNull(unrelatedWorkflow);
+        Assert.Equal(AgentWorkflowStatus.Failed, unrelatedWorkflow.Status);
+        Assert.Equal("OutOfScopeObjective", unrelatedWorkflow.FailureCode);
+        Assert.Empty(unrelatedWorkflow.Shortlist);
+
         var deleteResponse = await seekerClient.DeleteAsync("/api/cv");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await seekerClient.GetAsync("/api/cv")).StatusCode);
