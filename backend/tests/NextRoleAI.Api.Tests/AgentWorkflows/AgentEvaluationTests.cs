@@ -68,6 +68,32 @@ public sealed class AgentEvaluationTests
         Assert.Contains("cannot be processed safely", error.Message);
     }
 
+    [Theory]
+    [InlineData("Tell me about Sri Lanka and its most popular tourist attractions.")]
+    [InlineData("Summarise the history and culture of Sri Lanka for me.")]
+    [InlineData("Recommend three places to visit during my next holiday.")]
+    public void ObjectiveGuard_RejectsObjectivesOutsideJobSearch(string objective)
+    {
+        var guard = new ObjectiveGuard();
+
+        var error = Assert.ThrowsAny<Exception>(() => guard.ValidateAndNormalise(objective));
+
+        Assert.Contains("only supports job-search objectives", error.Message);
+    }
+
+    [Theory]
+    [InlineData("Tell me about software engineering jobs available in Sri Lanka.")]
+    [InlineData("Show the best remote role for my confirmed profile.")]
+    [InlineData("Compare suitable employment opportunities for my profile.")]
+    public void ObjectiveGuard_AllowsJobSearchObjectives(string objective)
+    {
+        var guard = new ObjectiveGuard();
+
+        var result = guard.ValidateAndNormalise(objective);
+
+        Assert.Equal(objective, result);
+    }
+
     [Fact]
     public void ValidationAgent_AcceptsGoldenCaseAndRejectsUnexpectedTool()
     {
